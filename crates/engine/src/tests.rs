@@ -1959,13 +1959,7 @@ fn create_and_reduce() {
     let src = Arc::new(fixture(1));
     s2.apply(
         id2,
-        Edit::InsertPagesFrom {
-            name: "x".into(),
-            bytes: src.clone(),
-            pages: None,
-            at: 1,
-            field_conflicts: novapdf_organize::FieldConflicts::Rename,
-        },
+        Edit::InsertPagesFrom { name: "x".into(), bytes: src.clone(), pages: None, at: 1, field_conflicts: novapdf_organize::FieldConflicts::Rename },
     )
     .unwrap();
     let full = s2.save_full_bytes(id2).unwrap();

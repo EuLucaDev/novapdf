@@ -331,8 +331,7 @@ fn an_encrypted_snapshot_without_metadata_still_requires_its_password() {
     assert_eq!(doc.path, None);
     assert_eq!(doc.info.pages.len(), 1);
     assert_eq!(s.read(&meta.key).unwrap(), saved, "recovery must not rewrite encrypted bytes");
-    let sidecar: novapdf_ui_egui::RecoveryMeta =
-        serde_json::from_slice(&std::fs::read(s.dir().join(format!("{}.json", meta.key))).unwrap()).unwrap();
+    let sidecar: novapdf_ui_egui::RecoveryMeta = serde_json::from_slice(&std::fs::read(s.dir().join(format!("{}.json", meta.key))).unwrap()).unwrap();
     assert!(sidecar.encrypted, "the replacement metadata records that the snapshot is encrypted");
 }
 

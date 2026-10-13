@@ -488,7 +488,7 @@ impl Annotator {
     }
 
     fn attachment(&mut self, doc: &mut Document, page: ObjectId, r: Rect) -> Dictionary {
-        let note = "Review notes for the NovaPdf showcase.\n\n\
+        let note = "Review notes for the Nova PDF showcase.\n\n\
                     - Page 9 exercises every common annotation type.\n\
                     - Each annotation carries its own appearance stream.\n";
         let fs = embedded_file(doc, "review-notes.txt", "text/plain", note.as_bytes(), "Notes attached to a comment", &self.now);

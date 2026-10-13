@@ -458,10 +458,7 @@ fn line_ending_properties_change_and_undo() {
     h.run_steps(2);
     let s = h.state();
     let doc = s.session.get(s.views[0].id).unwrap();
-    assert_eq!(
-        doc.comment_props(0, 0).unwrap().endings.as_deref(),
-        Some(&[novapdf_engine::LineEnding::None, novapdf_engine::LineEnding::None][..])
-    );
+    assert_eq!(doc.comment_props(0, 0).unwrap().endings.as_deref(), Some(&[novapdf_engine::LineEnding::None, novapdf_engine::LineEnding::None][..]));
 }
 
 #[test]

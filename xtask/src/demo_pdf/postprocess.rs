@@ -14,7 +14,7 @@ const TITLE: &str = "Nova PDF Showcase";
 const AUTHOR: &str = "Nova PDF";
 const SUBJECT: &str = "A specimen document exercising typography, world scripts, vector graphics, \
                        MathML, forms, annotations, layers and attachments.";
-const KEYWORDS: &[&str] = &["PDF", "typography", "OpenType", "AcroForm", "annotations", "optional content", "NovaPdf"];
+const KEYWORDS: &[&str] = &["PDF", "typography", "OpenType", "AcroForm", "annotations", "optional content", "Nova PDF"];
 const CREATOR: &str = "novapdf xtask demo-pdf";
 
 /// Chrome-printed page indices (0-based) that the post-processor refers to.
@@ -376,7 +376,7 @@ fn decode_text(bytes: &[u8]) -> String {
 fn tidy_title(title: &str) -> String {
     const ACRONYMS: &[&str] = &["PDF"];
     // Chrome drops the <br> between the two lines of the cover title.
-    if title == "NovaPdfShowcase" {
+    if title == "Nova PDFShowcase" {
         return TITLE.to_string();
     }
     let title = title.split_whitespace().collect::<Vec<_>>().join(" ");

@@ -645,9 +645,7 @@ fn errors_are_specific_and_safe() {
     let outside = std::env::temp_dir().join("novapdf-automation-outside.pdf");
     std::fs::write(&outside, fixture(1)).unwrap();
     assert!(matches!(err(&mut a, "doc_open", json!({ "path": outside.to_str().unwrap() })), ToolError::Failed(m) if m.contains("outside")));
-    assert!(
-        matches!(err(&mut a, "doc_open", json!({ "path": "../novapdf-automation-outside.pdf" })), ToolError::Failed(m) if m.contains("outside"))
-    );
+    assert!(matches!(err(&mut a, "doc_open", json!({ "path": "../novapdf-automation-outside.pdf" })), ToolError::Failed(m) if m.contains("outside")));
     let doc = ok(&mut a, "doc_open", json!({ "path": "a.pdf" }))["doc"].as_u64().unwrap();
     assert!(a.call("doc_save", &json!({ "doc": doc, "path": "new/../../escape.pdf" })).is_err());
     assert!(a.call("doc_save", &json!({ "doc": doc, "path": outside.to_str().unwrap() })).is_err());

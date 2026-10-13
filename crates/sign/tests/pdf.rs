@@ -126,10 +126,7 @@ fn signing_an_existing_field_and_counter_signing() {
     assert_eq!(a.status, Status::Unknown);
     let b = sigs.iter().find(|s| s.field == "Signature1").unwrap();
     assert_eq!((b.revision, b.modification.clone()), (3, Modification::None));
-    assert!(matches!(
-        novapdf_sign::sign(&doc, &id, &SignOptions { field: Some("Approval".into()), ..opts() }),
-        Err(novapdf_sign::SignError::Pdf(_))
-    ));
+    assert!(matches!(novapdf_sign::sign(&doc, &id, &SignOptions { field: Some("Approval".into()), ..opts() }), Err(novapdf_sign::SignError::Pdf(_))));
 }
 
 /// Issue #1328: a signature field whose /V is null, directly or through a reference, is unsigned:

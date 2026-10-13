@@ -1502,8 +1502,7 @@ fn dragging_a_page_moves_that_page_even_between_another_files_pages() {
     // b's page 2 dragged after c: that page alone moves; b is now in two parts.
     let (p2, c) = (card(&h, &page_card(2, "b.pdf")), card(&h, "c.pdf"));
     drag(&mut h, p2.center(), c.center() + vec2(c.width() * 0.3, 0.0));
-    let parts =
-        |h: &Harness<'static, NovaPdfApp>| h.state().combine_parts_shown().into_iter().map(|(n, p)| format!("{n}:{p:?}")).collect::<Vec<_>>();
+    let parts = |h: &Harness<'static, NovaPdfApp>| h.state().combine_parts_shown().into_iter().map(|(n, p)| format!("{n}:{p:?}")).collect::<Vec<_>>();
     assert_eq!(parts(&h), ["a.pdf:[0]", "b.pdf:[0, 2, 3]", "c.pdf:[0]", "b.pdf:[1]"]);
     // One undo step puts it back, as one file again.
     h.key_press_modifiers(Modifiers::COMMAND, Key::Z);
@@ -1642,8 +1641,7 @@ fn removing_pages_from_the_hover_bar_the_toolbar_and_delete_never_touches_the_fi
     let mut h = grid_of_pages(&[("a.pdf", 1), ("b.pdf", 4)]);
     let original = h.state().combine_draft[1].bytes.clone();
     expand(&mut h, "b.pdf");
-    let parts =
-        |h: &Harness<'static, NovaPdfApp>| h.state().combine_parts_shown().into_iter().map(|(n, p)| format!("{n}:{p:?}")).collect::<Vec<_>>();
+    let parts = |h: &Harness<'static, NovaPdfApp>| h.state().combine_parts_shown().into_iter().map(|(n, p)| format!("{n}:{p:?}")).collect::<Vec<_>>();
     // A page card's trash: that page.
     hover_card(&mut h, &page_card(2, "b.pdf"));
     h.get_by_label("Remove page").click();
@@ -1714,8 +1712,7 @@ fn pages_picked_out_of_sight_or_before_an_undo_are_let_go_of() {
     // Regression: a page picked, then hidden (its file collapsed, or the list shown) or undone,
     // stayed picked, and the trash or Delete took it.
     let mut h = grid_of_pages(&[("a.pdf", 1), ("b.pdf", 4), ("c.pdf", 1)]);
-    let parts =
-        |h: &Harness<'static, NovaPdfApp>| h.state().combine_parts_shown().into_iter().map(|(n, p)| format!("{n}:{p:?}")).collect::<Vec<_>>();
+    let parts = |h: &Harness<'static, NovaPdfApp>| h.state().combine_parts_shown().into_iter().map(|(n, p)| format!("{n}:{p:?}")).collect::<Vec<_>>();
     expand(&mut h, "b.pdf");
     // Collapsed from its hover bar: nothing picked, Delete takes nothing.
     h.get_by_label(&page_card(2, "b.pdf")).click();
@@ -1766,8 +1763,7 @@ fn pages_picked_out_of_sight_or_before_an_undo_are_let_go_of() {
 #[test]
 fn a_files_parts_join_when_what_was_between_them_goes_and_one_file_cannot_be_combined() {
     let mut h = grid_of_pages(&[("one.pdf", 2), ("two.pdf", 1)]);
-    let parts =
-        |h: &Harness<'static, NovaPdfApp>| h.state().combine_parts_shown().into_iter().map(|(n, p)| format!("{n}:{p:?}")).collect::<Vec<_>>();
+    let parts = |h: &Harness<'static, NovaPdfApp>| h.state().combine_parts_shown().into_iter().map(|(n, p)| format!("{n}:{p:?}")).collect::<Vec<_>>();
     expand(&mut h, "one.pdf");
     // one's page 2 after two: one is in two parts.
     let (p2, two) = (card(&h, &page_card(2, "one.pdf")), card(&h, "two.pdf"));

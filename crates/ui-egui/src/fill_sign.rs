@@ -1086,8 +1086,7 @@ impl crate::NovaPdfApp {
                 app.use_signature_photo(result.map_err(|e| e.to_string()));
                 return;
             }
-            let result =
-                std::fs::File::open(path).map_err(novapdf_engine::signature_image::SignatureImageError::from).and_then(SignatureImage::read);
+            let result = std::fs::File::open(path).map_err(novapdf_engine::signature_image::SignatureImageError::from).and_then(SignatureImage::read);
             app.use_signature_image(result.map_err(|e| e.to_string()));
         });
         #[cfg(target_arch = "wasm32")]

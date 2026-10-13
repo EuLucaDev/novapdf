@@ -442,7 +442,7 @@ fn shaped_width(t: &AddedText, s: &str, rtl: bool) -> f64 {
 
 fn arabic_error(e: GlyphError, text: &str) -> EditError {
     EditError::Invalid(match e {
-        GlyphError::NoFont => "Arabic text needs NovaPdf's Arabic font, which this build doesn't include \
+        GlyphError::NoFont => "Arabic text needs Nova PDF's Arabic font, which this build doesn't include \
                                (to build it in, set NOVAFOODS_FONTS_DIR to a novafoods-fonts checkout that has an Arab face)"
             .into(),
         GlyphError::Missing => format!("the Arabic font can't show \"{text}\""),
@@ -952,8 +952,7 @@ fn validate(c: &Content) -> Result<(), EditError> {
             // Everything else in it is drawn in the standard font, so it still has to fit.
             let undrawable = if t.text.chars().any(shaped_arabic) && novapdf_fonts::document_arabic_font().is_none() {
                 t.text.split('\n').find_map(|line| {
-                    line.chars()
-                        .find(|c| !(shaped_arabic(*c) || is_thai(*c) && novapdf_fonts::thai_has(*c) || novapdf_fonts::win_ansi_encodable(*c)))
+                    line.chars().find(|c| !(shaped_arabic(*c) || is_thai(*c) && novapdf_fonts::thai_has(*c) || novapdf_fonts::win_ansi_encodable(*c)))
                 })
             } else {
                 first_undrawable(t)

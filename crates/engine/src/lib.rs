@@ -2235,8 +2235,8 @@ fn run_edit(doc: &mut novapdf_cos::Document, edit: &Edit, cx: &mut EditCtx) -> R
             // for image fields (a laid-out one carries its SOM path; a static form's field name
             // is its path).
             let is_xfa = novapdf_xfa::read_packets(doc).ok().flatten().is_some();
-            let image_field = is_xfa
-                && novapdf_forms::fields(doc).iter().any(|f| f.name == *name && f.button == Some(novapdf_forms::af::ButtonAction::ImportIcon));
+            let image_field =
+                is_xfa && novapdf_forms::fields(doc).iter().any(|f| f.name == *name && f.button == Some(novapdf_forms::af::ButtonAction::ImportIcon));
             if image_field {
                 let Some(content_type) = image_content_type(image) else {
                     return Err(EditError::Invalid(format!("{name}: an XFA form keeps a PNG, JPEG or GIF picture; choose one of those")));
@@ -2425,8 +2425,8 @@ fn run_edit(doc: &mut novapdf_cos::Document, edit: &Edit, cx: &mut EditCtx) -> R
             match text {
                 Some(Ok(text)) if is_xfa_data_file(&text) => {
                     let expect_root = cx.xfa.as_ref().and_then(|t| t.root.common.name.clone());
-                    let r = novapdf_xfa::import_data(doc, &text, expect_root.as_deref(), cx.xfa_datasets)
-                        .map_err(|e| EditError::Write(e.to_string()))?;
+                    let r =
+                        novapdf_xfa::import_data(doc, &text, expect_root.as_deref(), cx.xfa_datasets).map_err(|e| EditError::Write(e.to_string()))?;
                     cx.xfa_datasets = r.stream.or(cx.xfa_datasets);
                     cx.xfa_out.errors.extend(r.warnings);
                     cx.xfa_out.console.push(format!("Imported XFA data: {} node(s)", r.nodes));
@@ -4475,11 +4475,7 @@ pub struct MarkFile {
 }
 
 /// Embed an image that is placed on a page, turned the way its EXIF Orientation says.
-fn embed_image(
-    doc: &mut novapdf_cos::Document,
-    name: &str,
-    bytes: &[u8],
-) -> Result<(novapdf_cos::ObjRef, (f64, f64)), novapdf_create::CreateError> {
+fn embed_image(doc: &mut novapdf_cos::Document, name: &str, bytes: &[u8]) -> Result<(novapdf_cos::ObjRef, (f64, f64)), novapdf_create::CreateError> {
     novapdf_create::image_xobject(doc, name, &upright_image::upright(bytes))
 }
 

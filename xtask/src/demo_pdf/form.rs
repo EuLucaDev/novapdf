@@ -63,7 +63,7 @@ pub fn build(doc: &mut Document, annotator: &mut Annotator, inputs: FormInputs<'
     });
 
     label(&mut c, LEFT, 510.0, "Comments  (multiline)");
-    let comments = "NovaPdf renders this field from its own appearance stream, so it looks \
+    let comments = "Nova PDF renders this field from its own appearance stream, so it looks \
                     the same in every viewer. Edit it to see your viewer regenerate the text.";
     b.text_field("comments", "Comments", Rect::new(LEFT, 446.0, RIGHT, 506.0), comments, None, 0, |d| {
         d.set("Ff", 4096);

@@ -26,7 +26,7 @@ const INVALID_REQUEST: i64 = -32600;
 const METHOD_NOT_FOUND: i64 = -32601;
 const INVALID_PARAMS: i64 = -32602;
 
-const INSTRUCTIONS: &str = "NovaPdf edits PDFs. Open a file with doc_open to get a document id, then inspect \
+const INSTRUCTIONS: &str = "Nova PDF edits PDFs. Open a file with doc_open to get a document id, then inspect \
 (doc_info, text_extract, text_find, page_render) or edit it (page_*, doc_set_info). Edits are undoable \
 (edit_undo) and stay in memory until doc_save. Page numbers are 1-based. Open documents are also \
 resources: novapdf://doc/{doc}/info, /text, /page/{page}/text and /page/{page}/image. \
@@ -131,7 +131,7 @@ impl McpServer {
                 Ok(json!({
                     "protocolVersion": version,
                     "capabilities": { "tools": { "listChanged": false }, "resources": { "listChanged": false, "subscribe": false } },
-                    "serverInfo": { "name": "novapdf", "title": "NovaPdf", "version": env!("CARGO_PKG_VERSION"), "websiteUrl": novapdf_engine::links::APP_PAGE },
+                    "serverInfo": { "name": "novapdf", "title": "Nova PDF", "version": env!("CARGO_PKG_VERSION"), "websiteUrl": novapdf_engine::links::APP_PAGE },
                     "instructions": if self.compact { format!("{INSTRUCTIONS}{COMPACT_INSTRUCTIONS}") } else { INSTRUCTIONS.to_string() },
                 }))
             }
@@ -203,8 +203,8 @@ fn meta_tools() -> [Value; 2] {
     [
         json!({
             "name": TOOL_SEARCH,
-            "title": "Find NovaPdf tools",
-            "description": "Search and list all NovaPdf automation tools, including the core tools, with a one-sentence description each. Filter by query \
+            "title": "Find Nova PDF tools",
+            "description": "Search and list all Nova PDF automation tools, including the core tools, with a one-sentence description each. Filter by query \
         (words matched against name, title and description) and/or category (the name prefix: doc, page, text, form, …). \
         With name, return that one tool in full, including its input_schema. Run a tool with tool_call.",
             "inputSchema": {
@@ -217,12 +217,12 @@ fn meta_tools() -> [Value; 2] {
                 "required": [],
                 "additionalProperties": false,
             },
-            "annotations": { "title": "Find NovaPdf tools", "readOnlyHint": true, "destructiveHint": false, "idempotentHint": true, "openWorldHint": false },
+            "annotations": { "title": "Find Nova PDF tools", "readOnlyHint": true, "destructiveHint": false, "idempotentHint": true, "openWorldHint": false },
         }),
         json!({
             "name": TOOL_CALL,
-            "title": "Run any NovaPdf tool",
-            "description": "Run any NovaPdf tool by name with its arguments, exactly as if it were called directly. \
+            "title": "Run any Nova PDF tool",
+            "description": "Run any Nova PDF tool by name with its arguments, exactly as if it were called directly. \
         Find names and argument schemas with tool_search. The result is the tool's own result.",
             "inputSchema": {
                 "type": "object",
@@ -233,7 +233,7 @@ fn meta_tools() -> [Value; 2] {
                 "required": ["name"],
                 "additionalProperties": false,
             },
-            "annotations": { "title": "Run any NovaPdf tool", "readOnlyHint": false, "destructiveHint": true, "idempotentHint": false, "openWorldHint": false },
+            "annotations": { "title": "Run any Nova PDF tool", "readOnlyHint": false, "destructiveHint": true, "idempotentHint": false, "openWorldHint": false },
         }),
     ]
 }

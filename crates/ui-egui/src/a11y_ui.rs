@@ -523,14 +523,8 @@ fn figure_picture(ctx: &egui::Context, doc: &novapdf_engine::Document, f: &novap
     };
     let config = novapdf_render::RenderConfig { password: doc.password.as_deref().map(std::sync::Arc::from), ..Default::default() };
     let mut r = novapdf_render::PageRenderer::new(doc.bytes.clone(), config);
-    let out = r.render(novapdf_render::RenderRequest {
-        page,
-        kind: novapdf_render::RequestKind::Pixels,
-        tile: Some(tile),
-        scale,
-        tag: 0,
-        preview: false,
-    });
+    let out =
+        r.render(novapdf_render::RenderRequest { page, kind: novapdf_render::RequestKind::Pixels, tile: Some(tile), scale, tag: 0, preview: false });
     if out.error.is_some() || out.width == 0 {
         return None;
     }

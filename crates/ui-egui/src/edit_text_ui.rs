@@ -780,8 +780,7 @@ pub(crate) fn install_source_fonts(ctx: &egui::Context, doc: &novapdf_engine::Do
             programs
                 .iter()
                 .filter(|p| {
-                    novapdf_fonts::embedding::face_key(&p.face) == novapdf_fonts::embedding::face_key(&program.face)
-                        && p.resource != program.resource
+                    novapdf_fonts::embedding::face_key(&p.face) == novapdf_fonts::embedding::face_key(&program.face) && p.resource != program.resource
                 })
                 .filter_map(|p| families.get(&p.resource).cloned()),
         );

@@ -733,7 +733,7 @@ fn save_prompt_stays_inside_the_screen_for_a_long_filename() {
     let name = "Psychology_ The Science of Mind and Behaviour, -- Nigel Holt, Andy Bremner, Michael \
                 Vliek, Ed Sutherland, -- 5, 2024 -- McGraw-Hill Education (UK) Ltd -- isbn13 97815268.pdf";
     let mut h = Harness::builder().with_size(egui::vec2(1365.0, 719.0)).build_eframe(move |_cc| {
-        let mut app = Nova PDFApp::new();
+        let mut app = NovaPdfApp::new();
         app.set_option("language", "en").unwrap();
         app.open_bytes(name, None, fixture(1)).expect("fixture opens");
         app.close_request = Some(CloseRequest::Tab(app.views[0].id));
@@ -768,7 +768,7 @@ fn save_prompt_fits_the_smallest_window_whatever_the_name() {
     for name in names {
         let start: String = name.chars().take(10).collect();
         let mut h = Harness::builder().with_size(size).build_eframe(move |_cc| {
-            let mut app = Nova PDFApp::new();
+            let mut app = NovaPdfApp::new();
             app.set_option("language", "en").unwrap();
             app.open_bytes(&name, None, fixture(1)).expect("fixture opens");
             app.close_request = Some(CloseRequest::Tab(app.views[0].id));
@@ -920,7 +920,7 @@ fn combine_list_does_not_warn_that_a_split_file_collides_with_itself() {
 /// copy keeps the field's name rather than becoming Text1-1.
 #[test]
 fn pasting_pages_into_their_own_document_keeps_field_names() {
-    let mut app = Nova PDFApp::new();
+    let mut app = NovaPdfApp::new();
     app.set_option("language", "en").unwrap();
     app.open_bytes("form.pdf", None, form_pdf("Text1")).unwrap();
     app.views[0].select_pages(&[0]);
@@ -931,7 +931,7 @@ fn pasting_pages_into_their_own_document_keeps_field_names() {
     assert!(doc.form.iter().all(|f| f.name == "Text1"), "{:?}", doc.form.iter().map(|f| &f.name).collect::<Vec<_>>());
 }
 
-fn texts_of(app: &Nova PDFApp, tab: usize) -> Vec<String> {
+fn texts_of(app: &NovaPdfApp, tab: usize) -> Vec<String> {
     let doc = app.session.get(app.views[tab].id).unwrap();
     let mut r = PageRenderer::new(doc.bytes.clone(), Default::default());
     (0..r.page_count())
@@ -1093,12 +1093,12 @@ fn alt_arrows_move_the_selected_file() {
     assert_eq!(h.state().combine_selection(), [1]);
 }
 
-fn combine_names(h: &Harness<'static, Nova PDFApp>) -> Vec<String> {
+fn combine_names(h: &Harness<'static, NovaPdfApp>) -> Vec<String> {
     h.state().combine_draft.iter().map(|f| f.name.clone()).collect()
 }
 
 /// Files in the Combine tab's list view (the table: headings, page ranges, row links).
-fn combine_of(names: &[(&str, usize)]) -> Harness<'static, Nova PDFApp> {
+fn combine_of(names: &[(&str, usize)]) -> Harness<'static, NovaPdfApp> {
     let files: Vec<(String, Vec<u8>)> = names.iter().map(|(n, p)| (n.to_string(), fixture(*p))).collect();
     let mut h = harness(1, move |app| {
         app.set_option("combine-view", "list").unwrap();
@@ -1244,7 +1244,7 @@ fn columns_resize_and_the_layout_is_kept_in_the_settings() {
     let size_index = novapdf_ui_egui::SortKey::Size as usize;
     assert!(widths[size_index] > 120.0, "{widths:?}");
     let saved = h.state().persist();
-    let mut fresh = Nova PDFApp::new();
+    let mut fresh = NovaPdfApp::new();
     fresh.set_option("language", "en").unwrap();
     fresh.restore(&saved);
     assert_eq!(fresh.combine_columns, h.state().combine_columns);
@@ -1341,7 +1341,7 @@ fn files_that_cannot_be_read_are_listed_and_left_out_once_the_user_agrees() {
     assert_eq!(texts_of(h.state(), 1), ["Page 1", "Page 2", "Page 1"]);
 }
 
-fn type_password(h: &mut Harness<'static, Nova PDFApp>, password: &str) {
+fn type_password(h: &mut Harness<'static, NovaPdfApp>, password: &str) {
     let field = h.get_by_role(Role::PasswordInput);
     field.focus();
     field.type_text(password);
@@ -3422,7 +3422,7 @@ fn one_editor_contains_mixed_styles_and_visual_rows() {
          BT /F2 10 Tf 20 195 Td (Last row) Tj ET",
     );
     let mut h = Harness::builder().with_size(egui::vec2(1400.0, 900.0)).build_eframe(move |_cc| {
-        let mut app = Nova PDFApp::new();
+        let mut app = NovaPdfApp::new();
         app.set_option("language", "en").unwrap();
         app.open_bytes("mixed.pdf", None, bytes).unwrap();
         app
@@ -3499,7 +3499,7 @@ fn private_document_regions_open_as_one_editor() {
     let bytes = std::fs::read(&path).unwrap();
     let original = bytes.clone();
     let mut h = Harness::builder().with_size(egui::vec2(1400.0, 1100.0)).build_eframe(move |_cc| {
-        let mut app = Nova PDFApp::new();
+        let mut app = NovaPdfApp::new();
         app.set_option("language", "en").unwrap();
         app.open_bytes("private.pdf", None, bytes).unwrap();
         app
@@ -3630,7 +3630,7 @@ fn inline_editor_preserves_source_font_and_previews_live_bounds() {
     cos.update_dict(novapdf_cos::ObjRef::new(3, 0), |d| *d = font).unwrap();
     let bytes = write_incremental(&cos, &Default::default()).unwrap();
     let mut h = Harness::builder().with_size(egui::vec2(1400.0, 900.0)).build_eframe(move |_cc| {
-        let mut app = Nova PDFApp::new();
+        let mut app = NovaPdfApp::new();
         app.set_option("language", "en").unwrap();
         app.open_bytes("stable.pdf", None, bytes).unwrap();
         app
@@ -3668,7 +3668,7 @@ fn inline_editor_preserves_source_font_and_previews_live_bounds() {
     for section in &shape.galley.job.sections {
         assert!(matches!(&section.format.font_id.family,egui::FontFamily::Name(name) if name.starts_with("pdf-source-")));
     }
-    let frame = |h: &Harness<'_, Nova PDFApp>| {
+    let frame = |h: &Harness<'_, NovaPdfApp>| {
         h.output()
             .shapes
             .iter()
@@ -3762,7 +3762,7 @@ fn clipped_artwork_with_labels_drawn(own_clip: bool) -> Vec<u8> {
 #[test]
 fn cropped_images_do_not_intercept_text_and_stay_inside_each_page() {
     let mut h = Harness::builder().with_size(egui::vec2(1400.0, 1100.0)).build_eframe(|_cc| {
-        let mut app = Nova PDFApp::new();
+        let mut app = NovaPdfApp::new();
         app.set_option("language", "en").unwrap();
         app.open_bytes("clipped.pdf", None, clipped_artwork_with_labels()).unwrap();
         app
@@ -3813,7 +3813,7 @@ fn cropped_images_do_not_intercept_text_and_stay_inside_each_page() {
 #[test]
 fn cropped_image_corner_resize_keeps_opposite_corner_and_scales_crop() {
     let mut h = Harness::builder().with_size(egui::vec2(1400.0, 1100.0)).build_eframe(|_cc| {
-        let mut app = Nova PDFApp::new();
+        let mut app = NovaPdfApp::new();
         app.set_option("language", "en").unwrap();
         app.open_bytes("clipped.pdf", None, clipped_artwork_with_labels_drawn(true)).unwrap();
         app
@@ -3885,7 +3885,7 @@ fn private_cropped_image_grips_resize_without_moving_the_opposite_corner() {
     let original = std::fs::read(&path).unwrap();
     let bytes = original.clone();
     let mut h = Harness::builder().with_size(egui::vec2(1400.0, 1100.0)).build_eframe(move |_cc| {
-        let mut app = Nova PDFApp::new();
+        let mut app = NovaPdfApp::new();
         app.set_option("language", "en").unwrap();
         app.open_bytes("private.pdf", None, bytes).unwrap();
         app
@@ -3977,7 +3977,7 @@ fn private_document_cropped_artwork_does_not_block_text() {
     let original = std::fs::read(&path).unwrap();
     let bytes = original.clone();
     let mut h = Harness::builder().with_size(egui::vec2(1400.0, 1100.0)).build_eframe(move |_cc| {
-        let mut app = Nova PDFApp::new();
+        let mut app = NovaPdfApp::new();
         app.set_option("language", "en").unwrap();
         app.open_bytes("private.pdf", None, bytes).unwrap();
         app
@@ -4042,7 +4042,7 @@ fn private_new_chinese_keyboard_input_preserves_font_layout_and_saved_pixels() {
     let bytes = original.clone();
     let font = Arc::new(std::fs::read(font_path).unwrap());
     let mut h = Harness::builder().with_size(egui::vec2(1400.0, 1100.0)).build_eframe(move |_cc| {
-        let mut app = Nova PDFApp::new();
+        let mut app = NovaPdfApp::new();
         app.set_option("language", "en").unwrap();
         app.open_bytes("private.pdf", None, bytes).unwrap();
         app

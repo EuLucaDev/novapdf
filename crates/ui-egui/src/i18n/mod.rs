@@ -791,7 +791,8 @@ mod tests {
     #[test]
     fn missing_ocr_models_messages_are_translated() {
         let error = novapdf_engine::ocr::OcrError::NoModels.to_string();
-        let notice = "Text recognition isn't installed: its model files are missing. Reinstall Nova PDF, or set NOVAPDF_MODELS to the folder that holds them.";
+        let notice =
+            "Text recognition isn't installed: its model files are missing. Reinstall Nova PDF, or set NOVAPDF_MODELS to the folder that holds them.";
         assert!(include_str!("../ocr_ui.rs").contains(notice), "keep in step with ocr_ui.rs");
         for code in ["bg", "cs", "de", "es", "fr", "hu", "ja", "ru", "te", "uk", "zh-hans", "zh-hant"] {
             let lang = Lang::from_code(code).expect("registered");
@@ -1224,12 +1225,8 @@ mod tests {
     #[test]
     fn spanish_keeps_the_holes_in_what_the_engine_says() {
         let es = Lang::from_code("es").expect("es registered");
-        let lists: [&[&str]; 4] = [
-            novapdf_engine::a11y::WORDINGS,
-            novapdf_engine::pdfa::WORDINGS,
-            novapdf_engine::sign::pdf::WORDINGS,
-            novapdf_engine::print::WORDINGS,
-        ];
+        let lists: [&[&str]; 4] =
+            [novapdf_engine::a11y::WORDINGS, novapdf_engine::pdfa::WORDINGS, novapdf_engine::sign::pdf::WORDINGS, novapdf_engine::print::WORDINGS];
         for wording in lists.into_iter().flatten() {
             let said = tr(es, wording);
             // `{}` is one hole; `{name}` holes are named, and each name must survive by itself.

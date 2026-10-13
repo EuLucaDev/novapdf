@@ -213,7 +213,7 @@ fn bottom_lines(n: usize) -> Vec<u8> {
 }
 
 /// Press at `from` and move to `to`, keeping the button down.
-fn press_and_move(h: &mut Harness<'static, Nova PDFApp>, from: Pos2, to: Pos2) {
+fn press_and_move(h: &mut Harness<'static, NovaPdfApp>, from: Pos2, to: Pos2) {
     h.event(Event::PointerButton { pos: from, button: PointerButton::Primary, pressed: true, modifiers: Modifiers::NONE });
     h.run_steps(1);
     for k in 1..=4 {
@@ -223,13 +223,13 @@ fn press_and_move(h: &mut Harness<'static, Nova PDFApp>, from: Pos2, to: Pos2) {
 }
 
 /// One wheel event, with time to scroll (egui spreads a wheel line over a few frames).
-fn wheel(h: &mut Harness<'static, Nova PDFApp>, unit: MouseWheelUnit, dy: f32) {
+fn wheel(h: &mut Harness<'static, NovaPdfApp>, unit: MouseWheelUnit, dy: f32) {
     h.event(Event::MouseWheel { unit, delta: egui::vec2(0.0, dy), phase: TouchPhase::Move, modifiers: Modifiers::NONE });
     h.run_steps(10);
 }
 
 /// The top edge of `page` on screen.
-fn page_top(h: &Harness<'static, Nova PDFApp>, page: usize) -> f32 {
+fn page_top(h: &Harness<'static, NovaPdfApp>, page: usize) -> f32 {
     h.state().views[0].page_screen_rect(page).expect("page on screen").min.y
 }
 
@@ -242,7 +242,7 @@ fn a_selection_drag_keeps_scrolling_over_the_gap_and_the_next_page() {
         app.set_option("layout", "continuous").unwrap();
         app.set_option("zoom", "200").unwrap();
     });
-    let glyph = |h: &Harness<'static, Nova PDFApp>, g: usize| h.state().views[0].glyph_screen_pos(0, g).expect("glyph on screen");
+    let glyph = |h: &Harness<'static, NovaPdfApp>, g: usize| h.state().views[0].glyph_screen_pos(0, g).expect("glyph on screen");
     // "ends" (glyphs 7..=10) in "Page 1 ends with this line".
     let (from, to) = (glyph(&h, 7), glyph(&h, 10));
     press_and_move(&mut h, from, to);
