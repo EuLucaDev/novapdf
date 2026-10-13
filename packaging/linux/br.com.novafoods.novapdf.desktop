@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=Nova PDF
+GenericName=PDF Editor
+Comment=Read, organize, combine, split and secure PDFs
+Exec=novapdf %U
+TryExec=novapdf
+Icon=br.com.novafoods.novapdf
+Terminal=false
+StartupNotify=true
+StartupWMClass=br.com.novafoods.novapdf
+Categories=Office;Viewer;
+Keywords=pdf;viewer;editor;annotate;sign;forms;merge;split;
+MimeType=application/pdf;

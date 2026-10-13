@@ -1,0 +1,11 @@
+*~
+plan/
+/target
+/dist
+/corpus
+/log
+.DS_Store
+/fuzz-out
+/assets/models
+# A novafoods-fonts checkout used as the optional NOVAFOODS_FONTS_DIR build input (CI and releases put it here).
+/novafoods-fonts

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  NovaPdf MSI (WiX Toolset v5: `dotnet tool install -g wix`). Built by package.ps1:
+
+    wix build novapdf.wxs installer-ui.wxs -arch x64 -d Version=1.2.3 -d BinDir=... -d ModelsDir=... -d IconPath=... -o out.msi
+
+  Per-machine install into Program Files, a Start Menu shortcut, a desktop shortcut (on by default,
+  optional, and an update keeps it only if it is still there), an App Paths entry, NovaPdf registered as a PDF handler (offered under "Open with"
+  and in Default apps, never forced as the default), and "Edit with NovaPdf" on PDF files'
+  right-click menu (on by default, optional). Files opened with NovaPdf arrive on its command
+  line.
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package
+      Name="NovaPdf"
+      Manufacturer="Learning Machines LLC"
+      Version="$(var.Version)"
+      UpgradeCode="EA00C367-7270-4C50-9D8B-A7A5C88AD27F"
+      Scope="perMachine"
+      Compressed="yes"
+      Language="1033">
+    <SummaryInformation Description="NovaPdf PDF workbench" Manufacturer="Learning Machines LLC" />
+    <!-- HKLM registrations must never point into a per-user installation (#305). Allow removal
+         of an existing installation even if an older MSI let it install per-user. -->
+    <Launch Condition="ALLUSERS = 1 OR (Installed AND REMOVE = &quot;ALL&quot;)"
+        Message="NovaPdf must be installed for all users. Run setup with administrator privileges and ALLUSERS=1; per-user installation is not supported." />
+    <!-- Same-version upgrades let successive pre-releases of one X.Y.Z replace each other
+         (MSI versions are numeric, so 1.2.3-rc.1 and 1.2.3-rc.2 are both 1.2.3). -->
+    <MajorUpgrade AllowSameVersionUpgrades="yes"
+        DowngradeErrorMessage="A newer version of NovaPdf is already installed." />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <!-- Windows Installer requires an Icon id ending in .ico or .exe, or advertised shortcuts and
+         Add/Remove Programs show a blank icon (#57). -->
+    <Icon Id="NovapdfIcon.ico" SourceFile="$(var.IconPath)" />
+    <Property Id="ARPPRODUCTICON" Value="NovapdfIcon.ico" />
+    <Property Id="ARPURLINFOABOUT" Value="https://workflowind.agcunae.com/apps/novapdf" />
+    <Property Id="ARPURLUPDATEINFO" Value="https://workflowind.agcunae.com/apps/novapdf" />
+    <Property Id="ARPHELPLINK" Value="https://workflowind.agcunae.com/inbox" />
+    <!-- Desktop shortcut (#143): on by default for a first install, a checkbox in the full-UI
+         welcome dialog, and INSTALLDESKTOPSHORTCUT=0 on the msiexec command line for unattended
+         installs. Secure, so the choice made in the (unelevated) UI reaches the elevated install.
+         An update keeps the shortcut only if it is still on the desktop (#1058): the launcher
+         updates with /passive and no properties, so deleting the shortcut is the only way its
+         users can say no. A value given on the command line wins. -->
+    <Property Id="INSTALLDESKTOPSHORTCUT" Secure="yes" />
+    <Property Id="EXISTINGDESKTOPSHORTCUT">
+      <DirectorySearch Id="DesktopSearch" Path="[DesktopFolder]" Depth="0">
+        <FileSearch Name="NovaPdf.lnk" />
+      </DirectorySearch>
+    </Property>
+    <SetProperty Id="INSTALLDESKTOPSHORTCUT" Value="1" After="AppSearch" Sequence="first"
+        Condition="NOT INSTALLDESKTOPSHORTCUT AND (NOT WIX_UPGRADE_DETECTED OR EXISTINGDESKTOPSHORTCUT)" />
+    <!-- "Edit with NovaPdf" on the right-click menu of PDF files in File Explorer (#682): on by
+         default, the same way, and INSTALLPDFCONTEXTMENU=0 for unattended installs without it. -->
+    <Property Id="INSTALLPDFCONTEXTMENU" Value="1" Secure="yes" />
+    <UIRef Id="NovapdfInstallerUI" />
+
+    <StandardDirectory Id="ProgramFiles6432Folder">
+      <Directory Id="INSTALLFOLDER" Name="NovaPdf">
+        <Directory Id="ModelsFolder" Name="models" />
+      </Directory>
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramMenuFolder" />
+    <StandardDirectory Id="DesktopFolder" />
+
+    <Feature Id="Main" Title="NovaPdf" Level="1">
+      <ComponentGroupRef Id="NovapdfFiles" />
+      <ComponentGroupRef Id="NovapdfModels" />
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <ComponentGroup Id="NovapdfFiles" Directory="INSTALLFOLDER">
+      <Component Id="NovapdfApp" Guid="E724C1C6-091F-4E21-A685-80D089FDBE21">
+        <File Id="NovapdfExe" Source="$(var.BinDir)\novapdf.exe" KeyPath="yes" />
+
+        <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\novapdf.exe" Value="[#NovapdfExe]" Type="string" />
+
+        <!-- PDF files (#107): NovaPdf is offered under "Open with" and in Settings ▸ Default
+             apps, through Windows' Default Programs registration (a ProgID, OpenWithProgids,
+             Capabilities and RegisteredApplications). It never takes over an existing default:
+             .pdf's own default value is left alone, and the user chooses. Without this, the only
+             NovaPdf entry to pick was the advertised Start Menu shortcut, which Windows can't
+             run as a file handler ("This app can't run on your PC"). -->
+        <RegistryValue Root="HKLM" Key="Software\Classes\NovaPdf.Document" Value="PDF Document" Type="string" />
+        <!-- A negative index selects the stable icon resource ID, rather than its position.
+             Resource 1 is the app's lion; resource 2 is the PDF document (build.rs). -->
+        <RegistryValue Root="HKLM" Key="Software\Classes\NovaPdf.Document\DefaultIcon" Value="&quot;[#NovapdfExe]&quot;,-2" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\NovaPdf.Document\shell\open\command" Value="&quot;[#NovapdfExe]&quot; &quot;%1&quot;" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\.pdf\OpenWithProgids" Name="NovaPdf.Document" Value="" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\novapdf.exe" Name="FriendlyAppName" Value="NovaPdf" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\novapdf.exe\DefaultIcon" Value="&quot;[#NovapdfExe]&quot;,-2" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\novapdf.exe\SupportedTypes" Name=".pdf" Value="" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\novapdf.exe\shell\open\command" Value="&quot;[#NovapdfExe]&quot; &quot;%1&quot;" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\NovaPdf\Capabilities" Name="ApplicationName" Value="NovaPdf" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\NovaPdf\Capabilities" Name="ApplicationDescription" Value="Open-source PDF workbench" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\NovaPdf\Capabilities" Name="ApplicationIcon" Value="[#NovapdfExe],0" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\NovaPdf\Capabilities\FileAssociations" Name=".pdf" Value="NovaPdf.Document" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\RegisteredApplications" Name="NovaPdf" Value="Software\NovaPdf\Capabilities" Type="string" />
+
+        <!-- Image context menu (#190): convert without changing image file defaults. -->
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.png\shell\NovaPdf.CreatePdf" Value="Create PDF with NovaPdf…" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.png\shell\NovaPdf.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.png\shell\NovaPdf.CreatePdf\command" Value="&quot;[#NovapdfExe]&quot; --create-images &quot;%1&quot;" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpg\shell\NovaPdf.CreatePdf" Value="Create PDF with NovaPdf…" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpg\shell\NovaPdf.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpg\shell\NovaPdf.CreatePdf\command" Value="&quot;[#NovapdfExe]&quot; --create-images &quot;%1&quot;" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpeg\shell\NovaPdf.CreatePdf" Value="Create PDF with NovaPdf…" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpeg\shell\NovaPdf.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpeg\shell\NovaPdf.CreatePdf\command" Value="&quot;[#NovapdfExe]&quot; --create-images &quot;%1&quot;" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.tif\shell\NovaPdf.CreatePdf" Value="Create PDF with NovaPdf…" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.tif\shell\NovaPdf.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.tif\shell\NovaPdf.CreatePdf\command" Value="&quot;[#NovapdfExe]&quot; --create-images &quot;%1&quot;" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.tiff\shell\NovaPdf.CreatePdf" Value="Create PDF with NovaPdf…" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.tiff\shell\NovaPdf.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.tiff\shell\NovaPdf.CreatePdf\command" Value="&quot;[#NovapdfExe]&quot; --create-images &quot;%1&quot;" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.gif\shell\NovaPdf.CreatePdf" Value="Create PDF with NovaPdf…" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.gif\shell\NovaPdf.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.gif\shell\NovaPdf.CreatePdf\command" Value="&quot;[#NovapdfExe]&quot; --create-images &quot;%1&quot;" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.bmp\shell\NovaPdf.CreatePdf" Value="Create PDF with NovaPdf…" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.bmp\shell\NovaPdf.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.bmp\shell\NovaPdf.CreatePdf\command" Value="&quot;[#NovapdfExe]&quot; --create-images &quot;%1&quot;" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jp2\shell\NovaPdf.CreatePdf" Value="Create PDF with NovaPdf…" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jp2\shell\NovaPdf.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jp2\shell\NovaPdf.CreatePdf\command" Value="&quot;[#NovapdfExe]&quot; --create-images &quot;%1&quot;" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.j2k\shell\NovaPdf.CreatePdf" Value="Create PDF with NovaPdf…" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.j2k\shell\NovaPdf.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.j2k\shell\NovaPdf.CreatePdf\command" Value="&quot;[#NovapdfExe]&quot; --create-images &quot;%1&quot;" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpx\shell\NovaPdf.CreatePdf" Value="Create PDF with NovaPdf…" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpx\shell\NovaPdf.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpx\shell\NovaPdf.CreatePdf\command" Value="&quot;[#NovapdfExe]&quot; --create-images &quot;%1&quot;" Type="string" />
+      </Component>
+
+      <!-- Shortcuts (#143) are plain links to novapdf.exe, not advertised MSI shortcuts: advertised
+           ones point at a Windows Installer descriptor rather than the program, which Windows can't
+           use as a file handler (#107), and 0.2.1's advertised one went missing from the Start menu
+           (#143). Each has its own component with an HKLM key path, so Windows Installer removes it
+           on uninstall; in this per-machine package both folders are the all-users ones. -->
+      <Component Id="NovapdfStartMenuShortcut" Directory="ProgramMenuFolder" Guid="DC028192-C233-4F99-9A77-ED458C60DF26">
+        <Shortcut Id="StartMenuShortcut" Name="NovaPdf" Description="NovaPdf PDF workbench"
+            Target="[#NovapdfExe]" WorkingDirectory="INSTALLFOLDER" Icon="NovapdfIcon.ico" IconIndex="0" />
+        <RegistryValue Root="HKLM" Key="Software\NovaPdf\Shortcuts" Name="StartMenu" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+
+      <Component Id="NovapdfDesktopShortcut" Directory="DesktopFolder" Guid="F6948627-32AB-4D78-8865-0FDF417CE442"
+          Condition="INSTALLDESKTOPSHORTCUT = 1">
+        <Shortcut Id="DesktopShortcut" Name="NovaPdf" Description="NovaPdf PDF workbench"
+            Target="[#NovapdfExe]" WorkingDirectory="INSTALLFOLDER" Icon="NovapdfIcon.ico" IconIndex="0" />
+        <RegistryValue Root="HKLM" Key="Software\NovaPdf\Shortcuts" Name="Desktop" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+
+      <!-- PDF context menu (#682): "Edit with NovaPdf" opens the file in NovaPdf whichever app is
+           the default for .pdf, which it leaves alone (SystemFileAssociations, like the image
+           menu). Several PDFs selected (up to 15, Windows' limit for this kind of entry) start one
+           launch each, and the single-instance hand-off opens them as tabs of one window. On
+           Windows 11 the entry is under "Show more options": the first-level menu only takes
+           packaged apps' (IExplorerCommand) entries. Its own component with an HKLM key path, so
+           INSTALLPDFCONTEXTMENU=0 leaves it out and uninstall removes it. -->
+      <Component Id="NovapdfPdfContextMenu" Guid="439F084F-657D-4AC2-A4CC-F099C518D71F"
+          Condition="INSTALLPDFCONTEXTMENU = 1">
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.pdf\shell\NovaPdf.Edit" Value="Edit with NovaPdf" Type="string" KeyPath="yes" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.pdf\shell\NovaPdf.Edit" Name="Icon" Value="&quot;[#NovapdfExe]&quot;,0" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.pdf\shell\NovaPdf.Edit" Name="MultiSelectModel" Value="Document" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.pdf\shell\NovaPdf.Edit\command" Value="&quot;[#NovapdfExe]&quot; &quot;%1&quot;" Type="string" />
+      </Component>
+
+      <Component Id="NovapdfCli">
+        <File Id="NovapdfCliExe" Source="$(var.BinDir)\novapdf-cli.exe" KeyPath="yes" />
+      </Component>
+      <!-- The embedded PDF icon's ISC notice and project licences travel with the binaries. -->
+      <Component Id="NovapdfDocumentIconLicense">
+        <File Id="NovapdfDocumentIconLicenseFile" Source="$(var.BinDir)\LICENSE-document.txt" KeyPath="yes" />
+      </Component>
+      <Component Id="NovapdfMitLicense">
+        <File Id="NovapdfMitLicenseFile" Source="$(var.BinDir)\LICENSE-MIT" KeyPath="yes" />
+      </Component>
+      <Component Id="NovapdfApacheLicense">
+        <File Id="NovapdfApacheLicenseFile" Source="$(var.BinDir)\LICENSE-APACHE" KeyPath="yes" />
+      </Component>
+      <Component Id="NovapdfNotice">
+        <File Id="NovapdfNoticeFile" Source="$(var.BinDir)\NOTICE" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <!-- OCR models (#103), with their licences and ATTRIBUTION.txt, in models\ beside novapdf.exe
+         where the app looks for them: every file `cargo xtask models` fetched (package.ps1), one
+         component each, so new models ship without naming them here. -->
+    <ComponentGroup Id="NovapdfModels" Directory="ModelsFolder">
+      <Files Include="$(var.ModelsDir)\*" />
+    </ComponentGroup>
+  </Fragment>
+</Wix>

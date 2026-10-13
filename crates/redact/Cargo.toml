@@ -1,0 +1,21 @@
+[package]
+name = "novapdf-redact"
+description = "Redaction (architecture §11.2): marks, apply (glyphs, images, vectors, XObjects, annotations, fields), verification"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+novapdf-cos = { workspace = true }
+novapdf-content = { workspace = true }
+novapdf-fonts = { workspace = true }
+novapdf-model = { workspace = true }
+novapdf-forms = { workspace = true }
+novapdf-edit = { workspace = true }
+novapdf-annot = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]

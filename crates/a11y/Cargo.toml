@@ -1,0 +1,19 @@
+[package]
+name = "novapdf-a11y"
+description = "Accessibility: the Accessibility Checker (32 rules), its report and fixes"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+novapdf-cos = { workspace = true }
+novapdf-model = { workspace = true }
+novapdf-content = { workspace = true }
+novapdf-filters = { workspace = true }
+novapdf-fonts = { workspace = true }
+thiserror.workspace = true
