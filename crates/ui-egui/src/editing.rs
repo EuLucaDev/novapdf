@@ -664,7 +664,7 @@ impl NovaPdfApp {
             self.notify_tr("The document was closed before it could be saved.");
             return false;
         };
-        let bytes = match self.session.save_bytes(id) {
+        let bytes = match self.session.save_bytes(id).and_then(|b| self.session.check_save(id, &b).map(|()| b)) {
             Ok(b) => b,
             Err(e) => {
                 self.notify_fmt("Couldn't save {name}: {e}", &[("name", &name), ("e", &e.to_string())]);
@@ -825,6 +825,12 @@ impl NovaPdfApp {
 
     fn quit(&mut self, ctx: &egui::Context) {
         self.allow_quit = true;
+        // macOS must terminate through AppKit, after the caller's save/discard decision.
+        // Closing the winit view first can abort in Touch Bar observer removal.
+        #[cfg(not(target_arch = "wasm32"))]
+        if self.use_platform_quit && nova_quit::quit() {
+            return;
+        }
         ctx.send_viewport_cmd(egui::ViewportCommand::Close);
     }
 

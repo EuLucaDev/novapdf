@@ -54,8 +54,8 @@ const APP_ICON_PNG: &[u8] = include_bytes!("../../../assets/app-icon/novapdf-102
 #[cfg(not(target_os = "macos"))]
 const APP_ICON_PNG: &[u8] = include_bytes!("../../../assets/app-icon/hicolor/256x256/apps/br.com.novafoods.novapdf.png");
 
-/// The app was called PrintCraft before; settings saved then are under this key.
-const LEGACY_STORAGE_KEY: &str = "printcraft";
+/// The app was called Nova PDF before; settings saved then are under this key.
+const LEGACY_STORAGE_KEY: &str = "novapdf";
 
 /// The settings folder: `app.ron` and the `logs` folder (docs/development.md). In portable mode
 /// it is `Nova PDFData` beside the executable (#157). eframe would otherwise derive it from the
@@ -67,7 +67,7 @@ fn settings_dir() -> Option<std::path::PathBuf> {
     eframe::storage_dir("Nova PDF")
 }
 
-/// Move the settings and crash-recovery folders of the app's former name, PrintCraft, to the new
+/// Move the settings and crash-recovery folders of the app's former name, Nova PDF, to the new
 /// name once, so an upgrade keeps recent files, preferences and unsaved work. Best effort: a
 /// folder is left alone when the new one already exists or the move fails. A portable copy leaves
 /// the per-user folders alone.
@@ -75,11 +75,11 @@ fn migrate_legacy_folders() {
     if novapdf_ui_egui::portable::data_dir().is_some() {
         return;
     }
-    let mut moves = vec![(eframe::storage_dir("PrintCraft"), settings_dir())];
+    let mut moves = vec![(eframe::storage_dir("Nova PDF"), settings_dir())];
     // Recovery lives in the settings folder except on Windows, where it is under %LOCALAPPDATA%.
     if cfg!(windows) {
         let local = std::env::var_os("LOCALAPPDATA").filter(|v| !v.is_empty()).map(std::path::PathBuf::from);
-        moves.push((local.as_ref().map(|d| d.join("PrintCraft")), local.map(|d| d.join("Nova PDF"))));
+        moves.push((local.as_ref().map(|d| d.join("Nova PDF")), local.map(|d| d.join("Nova PDF"))));
     }
     for (old, new) in moves {
         let (Some(old), Some(new)) = (old, new) else { continue };
@@ -206,7 +206,7 @@ fn main() -> eframe::Result {
     let window_controls = if cfg!(any(target_os = "macos", target_os = "windows")) { None } else { decorations::app_drawn() };
     migrate_legacy_folders();
     // The log file lives in the settings folder; opened after the arguments (so `--version` leaves
-    // no file behind) and after the PrintCraft migration (which a fresh folder would block).
+    // no file behind) and after the Nova PDF migration (which a fresh folder would block).
     // Records logged until now are written to it first.
     if let (Some(logger), Some(dir)) = (logger, settings_dir()) {
         match logger.attach_dir(&dir.join("logs")) {
@@ -354,6 +354,7 @@ fn app_creator<'a>(
         if let Some(json) = cc.storage.and_then(|s| s.get_string("novapdf").or_else(|| s.get_string(LEGACY_STORAGE_KEY))) {
             app.restore(&json);
         }
+        app.use_platform_quit = true;
         app.integrated_titlebar = integrated;
         app.window_controls = window_controls;
         app.system_text_scale = text_scale::system();

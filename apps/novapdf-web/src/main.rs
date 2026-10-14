@@ -23,8 +23,8 @@ fn main() {
                 options,
                 Box::new(|cc| {
                     let mut app = NovaPdfApp::new();
-                    // "printcraft": settings saved under the app's former name, PrintCraft.
-                    if let Some(json) = cc.storage.and_then(|s| s.get_string("novapdf").or_else(|| s.get_string("printcraft"))) {
+                    // "novapdf": settings saved under the app's former name, Nova PDF.
+                    if let Some(json) = cc.storage.and_then(|s| s.get_string("novapdf").or_else(|| s.get_string("novapdf"))) {
                         app.restore(&json);
                     }
                     // `?file=<url>` opens a PDF from a URL (same-origin or CORS-enabled).

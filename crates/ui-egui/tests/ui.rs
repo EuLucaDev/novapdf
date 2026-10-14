@@ -1,5 +1,7 @@
 //! Headless UI tests (egui_kittest + AccessKit). They drive the real app shell without a window.
 
+mod support;
+
 use egui_kittest::Harness;
 use egui_kittest::kittest::{NodeT, Queryable};
 use novapdf_ui_egui::NovaPdfApp;
@@ -681,9 +683,13 @@ fn dropping_a_pdf_on_the_window_opens_it() {
     assert!(h.state().views.is_empty());
     let file: egui::DroppedFileHandle = std::sync::Arc::new(Dropped { path: "dropped.pdf".into(), bytes: FIXTURE.to_vec() });
     h.input_mut().dropped_files.push(file);
-    h.run_steps(3);
+    support::wait_until(&mut h, "dropped document", |app| app.views.len() == 1 && app.password_prompt.is_none());
     assert_eq!(h.state().views.len(), 1, "the dropped PDF opens in a tab");
     h.get_by_label_contains("dropped.pdf");
+    let (_, id) = h.state().active_ids().unwrap();
+    let doc = h.state().session.get(id).unwrap();
+    assert_eq!(doc.name, "dropped.pdf");
+    assert_eq!(doc.bytes.as_slice(), FIXTURE);
 }
 
 #[test]
@@ -790,6 +796,23 @@ fn files_and_quit_from_the_operating_system() {
     h.step();
     let closing = h.output().viewport_output.values().any(|v| v.commands.iter().any(|c| matches!(c, egui::ViewportCommand::Close)));
     assert!(closing);
+}
+
+#[test]
+fn an_operating_system_quit_keeps_unsaved_work_for_the_save_prompt() {
+    use novapdf_ui_egui::{CloseRequest, OsEvent};
+    let queue = std::rc::Rc::new(std::cell::RefCell::new(Vec::new()));
+    let events = queue.clone();
+    let mut h = harness(move |app| {
+        app.open_bytes("unsaved.pdf", None, FIXTURE.to_vec()).unwrap();
+        app.execute("page.rotate");
+        app.os_events = Some(Box::new(move || events.borrow_mut().drain(..).collect()));
+    });
+    queue.borrow_mut().push(OsEvent::Quit);
+    h.step();
+    assert_eq!(h.state().close_request, Some(CloseRequest::Quit));
+    assert!(h.state().session.get(h.state().views[0].id).unwrap().dirty);
+    assert!(!h.output().viewport_output.values().any(|v| v.commands.contains(&egui::ViewportCommand::Close)));
 }
 
 #[test]
@@ -1179,4 +1202,75 @@ fn combine_tab_uses_tab_interaction_without_changing_close_or_document_state() {
     close_named_tab(&mut h, "Combine files");
     assert!(h.query_by_role_and_label(Role::Tab, "Combine files").is_none());
     assert_eq!(h.state().views.iter().map(|v| v.id).collect::<Vec<_>>(), document_ids);
+}
+
+/// Presses the named tab, drags it to `to` in a few steps and, unless `release` is false, lets go.
+fn drag_named_tab(h: &mut Harness<'static, NovaPdfApp>, name: &str, to: egui::Pos2, release: bool) {
+    let from = h.get_by_role_and_label(egui::accesskit::Role::Tab, name).rect().center();
+    h.event(egui::Event::PointerMoved(from));
+    h.event(egui::Event::PointerButton { pos: from, button: egui::PointerButton::Primary, pressed: true, modifiers: egui::Modifiers::NONE });
+    h.run_steps(1);
+    for k in 1..=6 {
+        h.event(egui::Event::PointerMoved(from.lerp(to, k as f32 / 6.0)));
+        h.run_steps(1);
+    }
+    if release {
+        h.event(egui::Event::PointerButton { pos: to, button: egui::PointerButton::Primary, pressed: false, modifiers: egui::Modifiers::NONE });
+        h.run_steps(3);
+    }
+}
+
+#[test]
+fn dragging_a_tab_moves_it_and_keeps_the_same_document_active() {
+    use egui::accesskit::Role;
+    let mut h = three_tab_harness();
+    let ids: Vec<_> = h.state().views.iter().map(|view| view.id).collect();
+    let tab = |h: &Harness<'static, NovaPdfApp>, name: &str| h.get_by_role_and_label(Role::Tab, name).rect();
+    // first.pdf past the end; last.pdf, the active one, keeps the focus at its new place.
+    let to = tab(&h, "last.pdf").right_center() + egui::vec2(20.0, 0.0);
+    drag_named_tab(&mut h, "first.pdf", to, true);
+    assert_eq!(h.state().views.iter().map(|view| view.id).collect::<Vec<_>>(), [ids[1], ids[2], ids[0]]);
+    assert_eq!(h.state().active_ids().map(|(_, id)| id), Some(ids[2]));
+    assert!(tab(&h, "first.pdf").left() > tab(&h, "last.pdf").right(), "the strip draws the new order");
+    // last.pdf, now in the middle, to the front.
+    let to = tab(&h, "middle.pdf").left_center() - egui::vec2(10.0, 0.0);
+    drag_named_tab(&mut h, "last.pdf", to, true);
+    assert_eq!(h.state().views.iter().map(|view| view.id).collect::<Vec<_>>(), [ids[2], ids[1], ids[0]]);
+    assert_eq!(h.state().active_ids().map(|(_, id)| id), Some(ids[2]));
+    assert_eq!(h.get_by_role_and_label(Role::Tab, "last.pdf").accesskit_node().is_selected(), Some(true));
+    // Moving tabs touches no document.
+    assert_eq!(h.state().session.docs().len(), 3);
+    for doc in h.state().session.docs() {
+        assert_eq!(doc.bytes.as_slice(), FIXTURE);
+        assert!(!doc.dirty);
+    }
+    if let Ok(dir) = std::env::var("NOVAPDF_TAB_SHOTS") {
+        let to = tab(&h, "first.pdf").left_center() - egui::vec2(10.0, 0.0);
+        drag_named_tab(&mut h, "last.pdf", to, false);
+        h.render().unwrap().save(format!("{dir}/dragging-tab.png")).unwrap();
+    }
+}
+
+#[test]
+fn a_tab_dropped_where_it_was_stays_and_a_click_still_selects_it() {
+    let mut h = three_tab_harness();
+    let ids: Vec<_> = h.state().views.iter().map(|view| view.id).collect();
+    let middle = h.get_by_role_and_label(egui::accesskit::Role::Tab, "middle.pdf").rect();
+    drag_named_tab(&mut h, "middle.pdf", middle.center() + egui::vec2(30.0, 0.0), true);
+    assert_eq!(h.state().views.iter().map(|view| view.id).collect::<Vec<_>>(), ids);
+    h.get_by_label("first.pdf").click();
+    h.run_steps(3);
+    assert_eq!(h.state().active_ids().map(|(_, id)| id), Some(ids[0]));
+    assert_eq!(h.state().views.iter().map(|view| view.id).collect::<Vec<_>>(), ids);
+}
+
+#[test]
+fn the_combine_tab_does_not_move_and_documents_stay_in_order() {
+    let mut h = three_tab_harness();
+    let ids: Vec<_> = h.state().views.iter().map(|view| view.id).collect();
+    h.state_mut().execute("page.combine");
+    h.run_steps(3);
+    let first = h.get_by_role_and_label(egui::accesskit::Role::Tab, "first.pdf").rect();
+    drag_named_tab(&mut h, "Combine files", first.left_center() - egui::vec2(10.0, 0.0), true);
+    assert_eq!(h.state().views.iter().map(|view| view.id).collect::<Vec<_>>(), ids);
 }

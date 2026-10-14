@@ -15,7 +15,9 @@ repository = "https://github.com/EuLucaDev/novapdf"
 # Shared frontend components; engines remain independent of egui.
 nova-ui = { path = "vendor/novafoods-libs-5c874d51ee/crates/ui", features = ["serde"] }
 # Shared system spooler; document composition remains in novapdf-print.
-nova-print = { path = "vendor/novafoods-libs-d991bf6792/crates/print" }
+nova-print = { path = "vendor/novafoods-libs-f03ec27ab2/crates/print" }
+# Native shutdown without tearing down the AppKit window during its run loop.
+nova-quit = { path = "vendor/novafoods-libs-f03ec27ab2/crates/quit", features = ["egui"] }
 # internal
 novapdf-geom = { path = "crates/geom", version = "0.10.0" }
 novapdf-filters = { path = "crates/filters", version = "0.10.0" }

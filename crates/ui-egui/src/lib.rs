@@ -602,6 +602,8 @@ pub struct NovaPdfApp {
     pub unsaved_flag: std::sync::Arc<std::sync::atomic::AtomicBool>,
     /// Requests from the operating system, polled every frame (macOS Apple events).
     pub os_events: Option<OsEventsFn>,
+    /// Enabled by the desktop host; embedded/headless shells keep normal viewport commands.
+    pub use_platform_quit: bool,
     /// Save delivers to the embedding page instead of downloading (web, see [`HostSaveFn`]).
     pub host_save: Option<HostSaveFn>,
     /// Reports unsaved work to the embedding page (web, see [`HostDirtyFn`]).
@@ -939,6 +941,7 @@ impl NovaPdfApp {
             failed_inbox: Default::default(),
             unsaved_flag: Default::default(),
             os_events: None,
+            use_platform_quit: false,
             host_save: None,
             host_dirty: None,
             close_request: None,
@@ -1185,11 +1188,15 @@ impl NovaPdfApp {
             open_worker::ResultKind::Failed(reason) => {
                 self.notify_fmt("Couldn't open {name}: {reason}", &[("name", &pending.name), ("reason", &reason)]);
             }
-            open_worker::ResultKind::Conversion(bytes) => {
-                if let Some(Err(error)) = self.open_converted(&pending.name, &bytes) {
-                    self.notify_fmt("Couldn't open {name}: {e}", &[("name", &pending.name), ("e", &error)]);
+            open_worker::ResultKind::Conversion(bytes) => match self.open_converted(&pending.name, &bytes) {
+                Some(Ok(())) => {
+                    if let Some(command) = pending.then {
+                        self.execute(command);
+                    }
                 }
-            }
+                Some(Err(error)) => self.notify_fmt("Couldn't open {name}: {e}", &[("name", &pending.name), ("e", &error)]),
+                None => {}
+            },
             open_worker::ResultKind::Prepared { bytes, result } => match *result {
                 Ok(prepared) => match self.finish_open(&pending.name, pending.path.clone(), bytes.len(), prepared, pending.activate) {
                     Ok(id) => {
@@ -1692,6 +1699,12 @@ impl NovaPdfApp {
 
     #[cfg(not(target_arch = "wasm32"))]
     pub fn open_path(&mut self, path: &str) {
+        self.open_path_then(path, None);
+    }
+
+    /// Keep a chosen tool with its file until preparation and any password entry finish.
+    #[cfg(not(target_arch = "wasm32"))]
+    fn open_path_then(&mut self, path: &str, then: Option<&'static str>) {
         let name = std::path::Path::new(path).file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_else(|| path.to_string());
         // Taken before reading: a build that rewrites the file meanwhile still counts as a change.
         let stamp = file_watch::Stamp::at(path);
@@ -1704,10 +1717,15 @@ impl NovaPdfApp {
                     let before = self.views.len();
                     if let Err(error) = self.open_bytes(&name, Some(path.to_string()), bytes) {
                         self.notify_fmt("Couldn't open {name}: {e}", &[("name", &name), ("e", &error)]);
-                    } else if self.views.len() > before
-                        && let Some(doc) = self.views.last().map(|view| view.id)
-                    {
-                        self.watch.known_as(doc, stamp);
+                    } else if let Some(prompt) = self.password_prompt.as_mut().filter(|p| p.path.as_deref() == Some(path)) {
+                        prompt.then = then;
+                    } else if self.views.len() > before {
+                        if let Some(doc) = self.views.last().map(|view| view.id) {
+                            self.watch.known_as(doc, stamp);
+                        }
+                        if let Some(command) = then {
+                            self.execute(command);
+                        }
                     }
                 }
                 Err(error) => self.notify_fmt("Couldn't read {name}: {e}", &[("name", &name), ("e", &error.to_string())]),
@@ -1724,7 +1742,7 @@ impl NovaPdfApp {
             activate: true,
             after_open: None,
             recovered: None,
-            then: None,
+            then,
         }) {
             self.notify_fmt("Couldn't open {name}: {e}", &[("name", &name), ("e", &error)]);
         }
@@ -1789,6 +1807,20 @@ impl NovaPdfApp {
             Some(a) if a >= self.views.len() => Some(self.views.len() - 1),
             other => other,
         };
+    }
+
+    /// Moves the tab at `from` so it sits at `to` (#1537). The same document stays active
+    /// wherever it lands; an index out of range changes nothing.
+    pub fn move_tab(&mut self, from: usize, to: usize) {
+        if from >= self.views.len() || to >= self.views.len() || from == to {
+            return;
+        }
+        let active = self.active_ids().map(|(_, id)| id);
+        let view = self.views.remove(from);
+        self.views.insert(to, view);
+        if let Some(id) = active {
+            self.active = self.views.iter().position(|v| v.id == id);
+        }
     }
 
     pub fn active_ids(&self) -> Option<(usize, DocId)> {
@@ -1978,14 +2010,7 @@ impl NovaPdfApp {
         let command = spec.id;
         self.ask_one(pickers::Ask::File(dialog), None, move |app, path| {
             let path = path.to_string_lossy().into_owned();
-            let before = app.views.len();
-            app.open_path(&path);
-            if let Some(prompt) = app.password_prompt.as_mut().filter(|p| p.path.as_deref() == Some(path.as_str())) {
-                // Encrypted: the tool runs once the password is in.
-                prompt.then = Some(command);
-            } else if app.views.len() > before && app.active.is_some() {
-                app.execute(command);
-            }
+            app.open_path_then(&path, Some(command));
         });
     }
 
@@ -2812,7 +2837,12 @@ impl eframe::App for NovaPdfApp {
         }
         // Don't replace a pending prompt or import. A startup file may need its own password
         // prompt, so its bytes stay queued until the current interaction finishes.
-        if self.password_prompt.is_none()
+        #[cfg(not(target_arch = "wasm32"))]
+        let opening = !self.pending_opens.is_empty();
+        #[cfg(target_arch = "wasm32")]
+        let opening = false;
+        if !opening
+            && self.password_prompt.is_none()
             && self.image_import.is_none()
             && self.dialog.is_none()
             && self.close_request.is_none()
@@ -2839,7 +2869,9 @@ impl eframe::App for NovaPdfApp {
                 #[cfg(target_arch = "wasm32")]
                 OsEvent::Open(_) => {}
                 // Like closing the window: `guard_quit` asks about unsaved changes.
-                OsEvent::Quit => ctx.send_viewport_cmd(egui::ViewportCommand::Close),
+                OsEvent::Quit => {
+                    self.request_quit(ctx);
+                }
             }
         }
         if let Some((_, id)) = self.active_ids() {
@@ -2893,6 +2925,11 @@ impl eframe::App for NovaPdfApp {
         self.process_file_requests();
         #[cfg(not(target_arch = "wasm32"))]
         self.process_picked();
+        // Last, after guard_quit can cancel a close to protect unsaved documents.
+        #[cfg(not(target_arch = "wasm32"))]
+        if self.use_platform_quit {
+            nova_quit::on_close_request(ctx);
+        }
     }
 
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
@@ -2900,7 +2937,6 @@ impl eframe::App for NovaPdfApp {
         #[cfg(not(target_arch = "wasm32"))]
         {
             live_ui::pump(self, &ctx);
-            live_ui::bar(self, ui);
             live_ui::window(self, &ctx);
         }
         i18n::set_current(i18n::Lang::from_pref(&self.language));
@@ -2924,6 +2960,8 @@ impl eframe::App for NovaPdfApp {
             self.window_title = title;
         }
         if self.full_screen && self.active.is_some() {
+            #[cfg(not(target_arch = "wasm32"))]
+            live_ui::bar(self, ui);
             // Full screen: the page, nothing else (Esc or ⌘L to leave).
             let t = theme::Tokens::get(&ctx);
             egui::CentralPanel::default().frame(egui::Frame::NONE.fill(if t.dark() { t.pasteboard } else { egui::Color32::from_gray(32) })).show(
@@ -2947,6 +2985,9 @@ impl eframe::App for NovaPdfApp {
         }
         chrome::tab_strip(self, ui);
         chrome::mode_bar(self, ui);
+        // Preserve the native title-bar band; collaboration belongs below the app chrome.
+        #[cfg(not(target_arch = "wasm32"))]
+        live_ui::bar(self, ui);
         if self.active.is_some() {
             chrome::right_rail(self, ui);
             // Read mode hides the tools, not the navigation panes: the rail stays visible

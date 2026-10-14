@@ -24,7 +24,7 @@ trailer << /Root 1 0 R >>
 %%EOF";
 
 fn harness(setup: impl FnOnce(&mut NovaPdfApp) + 'static) -> Harness<'static, NovaPdfApp> {
-    let mut h = Harness::builder().with_size(egui::vec2(1400.0, 900.0)).build_eframe(move |_cc| {
+    let mut h = Harness::builder().with_size(egui::vec2(1400.0, 1100.0)).build_eframe(move |_cc| {
         let mut app = NovaPdfApp::new();
         app.set_option("language", "en").unwrap();
         app.open_bytes("text.pdf", None, TEXT_FIXTURE.to_vec()).expect("opens");
@@ -51,7 +51,13 @@ fn settle(h: &mut Harness<'static, NovaPdfApp>) {
 /// A point on page 1 in PDF user space → screen (no rotation; MediaBox 300×200).
 fn at(h: &Harness<'static, NovaPdfApp>, x: f32, y: f32) -> Pos2 {
     let r = h.state().views[0].page_screen_rect(0).expect("page 1 on screen");
-    pos2(r.left() + x / 300.0 * r.width(), r.top() + (200.0 - y) / 200.0 * r.height())
+    let point = pos2(r.left() + x / 300.0 * r.width(), r.top() + (200.0 - y) / 200.0 * r.height());
+    assert!(
+        h.state().views[0].viewport_rect().contains(point),
+        "fixture point {point:?} outside viewport {:?}; page {r:?}",
+        h.state().views[0].viewport_rect()
+    );
+    point
 }
 
 fn drag(h: &mut Harness<'static, NovaPdfApp>, from: Pos2, to: Pos2) {

@@ -787,7 +787,7 @@ mod tests {
     }
 
     /// #103: the missing-OCR-models messages are translated under their current English text
-    /// (catalogs once keyed an older `PRINTCRAFT_MODELS` wording, which never matched).
+    /// (catalogs once keyed an older `NOVAPDF_LEGACY_MODELS` wording, which never matched).
     #[test]
     fn missing_ocr_models_messages_are_translated() {
         let error = novapdf_engine::ocr::OcrError::NoModels.to_string();
@@ -799,7 +799,7 @@ mod tests {
             assert!(has(lang, notice) && has(lang, &error), "{code}");
         }
         for lang in &LANGUAGES {
-            assert!(!lang.source.contains("PRINTCRAFT"), "{}", lang.code);
+            assert!(!lang.source.contains("NOVAPDF_LEGACY"), "{}", lang.code);
         }
     }
 
