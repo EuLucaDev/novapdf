@@ -186,6 +186,10 @@ pub(crate) trait Host {
     fn set(&mut self, key: &str, value: &str) -> Reply;
     fn open(&mut self, path: &str) -> Reply;
     fn quit(&mut self, ctx: &egui::Context) -> bool;
+    /// Colaboração (`live.host`, `live.join`, `live.status`, `live.stop`, `live.end`, `live.renew`).
+    fn live(&mut self, _method: &str, _p: &Value) -> Option<Reply> {
+        None
+    }
 }
 
 impl Control {
@@ -295,6 +299,10 @@ impl Control {
                 Ok(Handled::Now(host.set(str_param("key")?, &value)))
             }
             "ui.open" => Ok(Handled::Now(host.open(str_param("path")?))),
+            m if m.starts_with("live.") => match host.live(m, p) {
+                Some(r) => Ok(Handled::Now(r)),
+                None => Err(format!("unknown method {m}")),
+            },
             "ui.inspect" => Ok(Handled::Now(Ok(self.inspect(p)))),
             "ui.click" => self.click(p),
             "ui.focus" => self.focus(p),
@@ -632,6 +640,16 @@ fn screenshot_png(image: &egui::ColorImage, region: Option<egui::Rect>, ppp: f32
 }
 
 impl Host for crate::NovaPdfApp {
+    fn live(&mut self, method: &str, p: &Value) -> Option<Reply> {
+        #[cfg(not(target_arch = "wasm32"))]
+        return crate::live_ui::control(self, method, p);
+        #[cfg(target_arch = "wasm32")]
+        {
+            let _ = (method, p);
+            None
+        }
+    }
+
     fn dock(&mut self, reset: bool, params: &Value) -> Reply {
         crate::docking::command(self, reset, params)
     }
