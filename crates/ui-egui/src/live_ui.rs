@@ -149,7 +149,9 @@ pub fn pump(app: &mut NovaPdfApp, ctx: &Context) {
         app.live.open = true;
         join(app, &text);
     }
-    if app.live.live.is_some() && app.session.live_active() { app.live.document_ready = true; }
+    if app.live.live.is_some() && app.session.live_active() {
+        app.live.document_ready = true;
+    }
     if app.live.document_ready && !app.session.live_active() {
         stop(app);
         app.live.error = Some("A colaboração terminou porque o arquivo compartilhado foi fechado ou substituído.".into());
