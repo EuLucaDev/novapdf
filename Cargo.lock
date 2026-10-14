@@ -3232,6 +3232,7 @@ dependencies = [
  "novapdf-xfa",
  "novapdf-xfdf",
  "png 0.18.1",
+ "serde_json",
  "thiserror 2.0.21",
  "url",
 ]
