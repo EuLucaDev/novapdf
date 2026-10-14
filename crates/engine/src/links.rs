@@ -522,7 +522,7 @@ mod tests {
 
     #[test]
     fn urls_follow_the_novafoods_scheme() {
-        assert_eq!(super::APP_PAGE, format!("{}/apps/{}", super::WEBSITE, super::APP));
+        assert_eq!(super::APP_PAGE, format!("{}/{}", super::WEBSITE, super::APP));
         assert_eq!(super::GITHUB, format!("https://github.com/EuLucaDev/{}", super::APP));
         for l in super::LINKS {
             assert!(l.url.starts_with("https://"), "{}", l.url);
