@@ -26,6 +26,7 @@ pub mod dates;
 pub mod export;
 pub mod js;
 pub mod links;
+pub mod live;
 pub mod ocr;
 pub mod optimizer;
 pub mod printcheck;
@@ -2673,6 +2674,7 @@ impl From<novapdf_sign::SignError> for EditError {
 
 #[derive(Default)]
 pub struct Session {
+    pub live: live::LiveState,
     docs: Vec<Document>,
     next_id: u64,
     /// Seconds since the Unix epoch, injected so saves are deterministic in tests.

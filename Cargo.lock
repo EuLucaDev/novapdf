@@ -1226,6 +1226,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "data-encoding"
+version = "2.11.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4583a4551df46e2792f82ceeac45e850d2e2d5debba0b91f102385cda5b11f06"
+
+[[package]]
 name = "data-url"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3007,6 +3013,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "nova-live"
+version = "0.1.0"
+source = "git+https://github.com/EuLucaDev/nova-live?rev=73c86a72931074d3a0b55997ac0d9dc64237cfa1#73c86a72931074d3a0b55997ac0d9dc64237cfa1"
+dependencies = [
+ "base64 0.22.1",
+ "getrandom 0.4.3",
+ "rustls",
+ "serde",
+ "serde_json",
+ "tungstenite",
+ "webpki-roots",
+]
+
+[[package]]
 name = "nova-print"
 version = "0.1.0"
 dependencies = [
@@ -3023,7 +3043,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "eframe",
  "egui",
@@ -3045,7 +3065,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-a11y"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "novapdf-content",
  "novapdf-cos",
@@ -3057,7 +3077,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-annot"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "hayro-syntax",
  "novapdf-cos",
@@ -3068,7 +3088,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-audit"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "novapdf-content",
  "novapdf-cos",
@@ -3079,7 +3099,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-automation"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "base64 0.22.1",
  "flate2",
@@ -3100,7 +3120,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-cli"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "base64 0.22.1",
  "novapdf-audit",
@@ -3115,18 +3135,18 @@ dependencies = [
 
 [[package]]
 name = "novapdf-compare"
-version = "0.7.1"
+version = "0.8.0"
 
 [[package]]
 name = "novapdf-content"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "novapdf-cos",
 ]
 
 [[package]]
 name = "novapdf-cos"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "hayro-syntax",
  "novapdf-crypt",
@@ -3138,7 +3158,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-create"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "encoding_rs",
  "hayro-syntax",
@@ -3154,7 +3174,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-crypt"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "aes",
  "md-5",
@@ -3166,7 +3186,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-edit"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "hayro-syntax",
  "kurbo 0.13.1",
@@ -3181,7 +3201,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-engine"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "chrono",
  "icu_properties",
@@ -3218,14 +3238,14 @@ dependencies = [
 
 [[package]]
 name = "novapdf-export"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "flate2",
 ]
 
 [[package]]
 name = "novapdf-filters"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "flate2",
  "proptest",
@@ -3235,7 +3255,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-fonts"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "harfrust",
  "novapdf-cos",
@@ -3245,7 +3265,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-forms"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "hayro-syntax",
  "novapdf-content",
@@ -3257,18 +3277,18 @@ dependencies = [
 
 [[package]]
 name = "novapdf-geom"
-version = "0.7.1"
+version = "0.8.0"
 
 [[package]]
 name = "novapdf-js"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "boa_engine",
 ]
 
 [[package]]
 name = "novapdf-measure"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "novapdf-annot",
  "novapdf-content",
@@ -3280,14 +3300,14 @@ dependencies = [
 
 [[package]]
 name = "novapdf-model"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "novapdf-cos",
 ]
 
 [[package]]
 name = "novapdf-ocr"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "novapdf-fonts",
  "ocrs",
@@ -3297,7 +3317,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-optimize"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "image",
  "novapdf-annot",
@@ -3310,7 +3330,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-organize"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "hayro-syntax",
  "novapdf-content",
@@ -3320,7 +3340,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-platform"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "async-channel",
  "futures-lite",
@@ -3329,7 +3349,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-preflight"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "novapdf-cos",
  "novapdf-model",
@@ -3337,7 +3357,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-print"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "nova-print",
  "novapdf-content",
@@ -3348,7 +3368,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-redact"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "novapdf-annot",
  "novapdf-content",
@@ -3362,7 +3382,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-render"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "bytemuck",
  "flate2",
@@ -3381,7 +3401,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-sign"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "aes",
  "aws-lc-rs",
@@ -3415,7 +3435,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-ui-egui"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "arboard",
  "base64 0.22.1",
@@ -3428,6 +3448,7 @@ dependencies = [
  "image",
  "js-sys",
  "log",
+ "nova-live",
  "nova-ui",
  "novapdf-cos",
  "novapdf-engine",
@@ -3457,7 +3478,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-web"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "eframe",
  "egui",
@@ -3469,7 +3490,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-xfa"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "base64 0.22.1",
  "image",
@@ -3483,7 +3504,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-xfdf"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "novapdf-annot",
  "novapdf-cos",
@@ -5542,7 +5563,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
 dependencies = [
  "fastrand",
- "getrandom 0.4.3",
+ "getrandom 0.3.4",
  "once_cell",
  "rustix 1.1.5",
  "windows-sys 0.59.0",
@@ -5782,6 +5803,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "db97caf9d906fbde555dd62fa95ddba9eecfd14cb388e4f491a66d74cd5fb79a"
 dependencies = [
  "once_cell",
+]
+
+[[package]]
+name = "tungstenite"
+version = "0.30.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e48ac77174b19c110a50ab2128b24215ac9cb40e0e12e093fb602d175c569d22"
+dependencies = [
+ "bytes",
+ "data-encoding",
+ "http",
+ "httparse",
+ "log",
+ "rand 0.10.3",
+ "sha1",
+ "thiserror 2.0.21",
 ]
 
 [[package]]
@@ -6302,6 +6339,15 @@ dependencies = [
  "objc2-foundation 0.3.2",
  "url",
  "web-sys",
+]
+
+[[package]]
+name = "webpki-roots"
+version = "1.0.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7dcd9d09a39985f5344844e66b0c530a33843579125f23e21e9f0f220850f22a"
+dependencies = [
+ "rustls-pki-types",
 ]
 
 [[package]]

@@ -29,6 +29,8 @@ pub mod canvas;
 mod chrome;
 mod combine_grid;
 mod image_pick;
+#[cfg(not(target_arch = "wasm32"))]
+pub mod live_ui;
 mod tags_ui;
 pub use combine_grid::ThumbState as CombineThumb;
 mod combine_ui;
@@ -466,6 +468,8 @@ pub struct RecentFile {
 }
 
 pub struct NovaPdfApp {
+    #[cfg(not(target_arch = "wasm32"))]
+    pub live: live_ui::LiveUi,
     pub docking: docking::Workspace,
     pub(crate) pending_panel_reveals: Vec<docking::Panel>,
     pub session: Session,
@@ -858,6 +862,8 @@ fn rgb_triple(v: &serde_json::Value) -> Option<[f64; 3]> {
 impl NovaPdfApp {
     pub fn new() -> Self {
         Self {
+            #[cfg(not(target_arch = "wasm32"))]
+            live: live_ui::LiveUi::default(),
             session: Session::new(),
             views: Vec::new(),
             closed_tabs: Vec::new(),
@@ -2891,6 +2897,12 @@ impl eframe::App for NovaPdfApp {
 
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         let ctx = ui.ctx().clone();
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            live_ui::pump(self, &ctx);
+            live_ui::bar(self, ui);
+            live_ui::window(self, &ctx);
+        }
         i18n::set_current(i18n::Lang::from_pref(&self.language));
         // Fonts registered via set_fonts only take effect next frame; named families would panic now.
         if !self.fonts_ready {

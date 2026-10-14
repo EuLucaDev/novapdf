@@ -181,7 +181,7 @@ fn main() -> eframe::Result {
     let mut control_file: Option<String> = None;
     let mut create_images = false;
     let mut new_window = false;
-    let mut args = std::env::args().skip(1);
+    let mut args = std::env::args().skip(1).filter(|arg| !novapdf_ui_egui::live_ui::is_invite_arg(arg));
     while let Some(a) = args.next() {
         match a.as_str() {
             "--version" => {
@@ -342,6 +342,7 @@ fn app_creator<'a>(
     Box::new(move |cc| {
         started.set(true);
         let mut app = NovaPdfApp::new();
+        app.live.pending_join = novapdf_ui_egui::live_ui::launch_invite();
         // First start (or settings from before Units existed): the region's unit.
         app.units = novapdf_ui_egui::units::Unit::system();
         #[cfg(target_os = "linux")]
