@@ -22,6 +22,9 @@ macro_rules! tl_ctx {
     };
 }
 
+#[cfg(not(target_arch = "wasm32"))]
+pub use nova_account_ui as account_ui;
+
 mod a11y_ui;
 mod actions_ui;
 mod appearance;
@@ -2933,6 +2936,10 @@ impl eframe::App for NovaPdfApp {
     }
 
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
+        #[cfg(not(target_arch = "wasm32"))]
+        if !crate::account_ui::gate(ui, "novapdf") {
+            return;
+        }
         let ctx = ui.ctx().clone();
         #[cfg(not(target_arch = "wasm32"))]
         {
