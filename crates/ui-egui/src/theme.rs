@@ -11,6 +11,18 @@ pub enum ThemeKind {
     #[default]
     Light,
     Dark,
+    /// One of the Nova Foods suite themes (Nova Photo's fourteen, from `nova-themes`).
+    Suite(nova_themes::ThemeKind),
+}
+
+impl ThemeKind {
+    pub fn is_dark(self) -> bool {
+        match self {
+            ThemeKind::Light => false,
+            ThemeKind::Dark => true,
+            ThemeKind::Suite(kind) => kind.is_dark(),
+        }
+    }
 }
 
 /// The saved user choice, independent of the light/dark colours currently displayed.
@@ -20,6 +32,8 @@ pub enum ThemePreference {
     #[default]
     Light,
     Dark,
+    /// A Nova Foods suite theme, whatever the system says.
+    Suite(nova_themes::ThemeKind),
 }
 
 impl ThemePreference {
@@ -29,6 +43,7 @@ impl ThemePreference {
         match self {
             Self::Light => ThemeKind::Light,
             Self::Dark => ThemeKind::Dark,
+            Self::Suite(kind) => ThemeKind::Suite(kind),
             Self::System => match system {
                 Some(true) => ThemeKind::Dark,
                 Some(false) => ThemeKind::Light,
@@ -70,6 +85,7 @@ pub struct Tokens {
 impl Tokens {
     pub fn for_kind(kind: ThemeKind) -> Self {
         match kind {
+            ThemeKind::Suite(suite) => Self::for_suite(suite),
             ThemeKind::Light => Self {
                 kind,
                 titlebar: Color32::from_rgb(0xE9, 0xE9, 0xEB),
@@ -126,8 +142,44 @@ impl Tokens {
     }
 
     pub fn dark(&self) -> bool {
-        self.kind == ThemeKind::Dark
+        self.kind.is_dark()
     }
+
+    /// A suite theme paints the chrome (title bar, tool bars, panels, fields, text, accent);
+    /// pages stay white and keep their shadow.
+    pub fn for_suite(suite: nova_themes::ThemeKind) -> Self {
+        let p = suite.palette();
+        let dark = suite.is_dark();
+        let base = Self::for_kind(if dark { ThemeKind::Dark } else { ThemeKind::Light });
+        let ink = if dark { nova_themes::mix(p.accent, [255, 255, 255, 255], 0.3) } else { nova_themes::mix(p.accent, [0, 0, 0, 255], 0.15) };
+        Self {
+            kind: ThemeKind::Suite(suite),
+            titlebar: rgba(p.chrome),
+            chrome: rgba(p.card),
+            panel: rgba(p.card),
+            pasteboard: rgba(p.canvas),
+            card: rgba(p.card),
+            border: rgba(p.card_border),
+            divider: rgba(p.separator),
+            text: rgba(p.text),
+            text_muted: rgba(p.text_dim),
+            text_faint: rgba(p.text_faint),
+            icon: rgba(p.icon),
+            hover: rgba(p.hover),
+            pressed: rgba(p.pressed),
+            selected: rgba(p.row_selected),
+            accent: rgba(p.accent),
+            accent_text: rgba(ink),
+            accent_soft: rgba(nova_themes::alpha(p.accent, if dark { 70 } else { 45 })),
+            field: rgba(p.field),
+            radius: p.radius_sm.clamp(0.0, 12.0) as u8,
+            ..base
+        }
+    }
+}
+
+fn rgba(c: nova_themes::Rgba) -> Color32 {
+    Color32::from_rgba_unmultiplied(c[0], c[1], c[2], c[3])
 }
 
 /// Hover and press amounts for chrome controls. The wash eases in; holding the pointer

@@ -7,15 +7,35 @@ use crate::NovaPdfApp;
 use crate::theme::{self, ThemeKind, ThemePreference, Tokens};
 use crate::widgets;
 
-/// The themes each card offers. One of each today; a new theme is one more row here.
-pub const LIGHT_THEMES: &[(ThemeKind, &str)] = &[(ThemeKind::Light, "Light gray")];
-pub const DARK_THEMES: &[(ThemeKind, &str)] = &[(ThemeKind::Dark, "Dark gray")];
+/// The themes each card offers: Nova PDF's own, then the Nova Foods suite themes of that
+/// brightness.
+pub fn light_themes() -> Vec<(ThemeKind, &'static str)> {
+    themes(false, (ThemeKind::Light, "Light gray"))
+}
+pub fn dark_themes() -> Vec<(ThemeKind, &'static str)> {
+    themes(true, (ThemeKind::Dark, "Dark gray"))
+}
+fn themes(dark: bool, own: (ThemeKind, &'static str)) -> Vec<(ThemeKind, &'static str)> {
+    std::iter::once(own)
+        .chain(nova_themes::ThemeKind::ALL.into_iter().filter(|k| k.is_dark() == dark).map(|k| (ThemeKind::Suite(k), k.label())))
+        .collect()
+}
+
+/// The command that picks `kind` as the theme.
+fn theme_command(kind: ThemeKind) -> String {
+    match kind {
+        ThemeKind::Light => "view.theme.light".into(),
+        ThemeKind::Dark => "view.theme.dark".into(),
+        ThemeKind::Suite(k) => format!("view.theme.{}", k.id()),
+    }
+}
 
 fn mode_label(preference: ThemePreference) -> &'static str {
     match preference {
         ThemePreference::System => "Use system setting",
         ThemePreference::Light => "Light",
         ThemePreference::Dark => "Dark",
+        ThemePreference::Suite(kind) => kind.label(),
     }
 }
 
@@ -23,7 +43,7 @@ fn mode_command(preference: ThemePreference) -> &'static str {
     match preference {
         ThemePreference::System => "view.theme.system",
         ThemePreference::Light => "view.theme.light",
-        ThemePreference::Dark => "view.theme.dark",
+        ThemePreference::Dark | ThemePreference::Suite(_) => "view.theme.dark",
     }
 }
 
@@ -83,8 +103,10 @@ fn preview(ui: &mut egui::Ui, kind: ThemeKind, width: f32) {
 }
 
 /// One theme card: its title, Active when it is what shows now, a preview of the chosen theme
-/// and a radio row per theme.
-fn card(ui: &mut egui::Ui, t: &Tokens, title: &str, active: bool, themes: &[(ThemeKind, &str)]) {
+/// and a radio row per theme. Returns the theme clicked.
+fn card(ui: &mut egui::Ui, t: &Tokens, title: &str, current: ThemeKind, themes: &[(ThemeKind, &str)]) -> Option<ThemeKind> {
+    let active = themes.iter().any(|(k, _)| *k == current);
+    let mut picked = None;
     egui::Frame::new()
         .fill(t.card)
         .stroke(egui::Stroke::new(1.0, if active { t.accent } else { t.border }))
@@ -99,14 +121,16 @@ fn card(ui: &mut egui::Ui, t: &Tokens, title: &str, active: bool, themes: &[(The
                 }
             });
             ui.add_space(4.0);
-            let shown = themes.first().map_or(ThemeKind::Light, |(kind, _)| *kind);
+            let shown = if active { current } else { themes.first().map_or(ThemeKind::Light, |(kind, _)| *kind) };
             preview(ui, shown, ui.available_width());
             ui.add_space(4.0);
             for (kind, label) in themes {
-                // One theme per card today, so it is always the chosen one.
-                let _ = ui.add(widgets::radio(*kind == shown, tl!(label)));
+                if ui.add(widgets::radio(active && *kind == current, tl!(label))).clicked() {
+                    picked = Some(*kind);
+                }
             }
         });
+    picked
 }
 
 /// The Appearance section of Preferences.
@@ -116,6 +140,7 @@ pub fn preferences_section(ui: &mut egui::Ui, app: &mut NovaPdfApp, t: &Tokens) 
         ui.label(tl!("Appearance mode"));
         egui::ComboBox::from_id_salt("appearance-mode").selected_text(tl!(mode_label(app.theme_preference))).show_ui(ui, |ui| {
             for preference in [ThemePreference::System, ThemePreference::Light, ThemePreference::Dark] {
+                // A suite theme is picked in the cards below.
                 if ui.selectable_label(app.theme_preference == preference, tl!(mode_label(preference))).clicked() {
                     app.execute(mode_command(preference));
                     ui.close();
@@ -124,12 +149,16 @@ pub fn preferences_section(ui: &mut egui::Ui, app: &mut NovaPdfApp, t: &Tokens) 
         });
     });
     ui.add_space(4.0);
-    let light_active = app.theme == ThemeKind::Light;
+    let current = app.theme;
+    let mut picked = None;
     ui.columns(2, |cols| {
         let [light, dark] = cols else { return };
-        card(light, t, tl!("Light theme"), light_active, LIGHT_THEMES);
-        card(dark, t, tl!("Dark theme"), !light_active, DARK_THEMES);
+        picked = card(light, t, tl!("Light theme"), current, &light_themes()).or(picked);
+        picked = card(dark, t, tl!("Dark theme"), current, &dark_themes()).or(picked);
     });
+    if let Some(kind) = picked {
+        app.execute(&theme_command(kind));
+    }
 }
 
 #[cfg(test)]

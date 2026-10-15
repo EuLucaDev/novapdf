@@ -7,11 +7,7 @@
 use novapdf_engine::Edit;
 use novapdf_engine::commands::{self, COMMANDS, CommandSpec, Shortcut};
 
-use crate::{
-    Dialog, Mode, NovaPdfApp, PropsTab, RightPanel, SaveTarget,
-    theme::{ThemeKind, ThemePreference},
-    widgets,
-};
+use crate::{Dialog, Mode, NovaPdfApp, PropsTab, RightPanel, SaveTarget, theme::ThemePreference, widgets};
 
 /// Keys the document view handles itself (`canvas::shortcuts`), for the View menu, tooltips and
 /// Help ▸ Keyboard shortcuts. Keep them in step with the bindings there.
@@ -263,13 +259,17 @@ impl NovaPdfApp {
             "view.next_tab" => self.step_tab(true),
             "view.previous_tab" => self.step_tab(false),
             "view.theme" => {
-                let next = if self.theme == ThemeKind::Light { ThemePreference::Dark } else { ThemePreference::Light };
+                let next = if self.theme.is_dark() { ThemePreference::Light } else { ThemePreference::Dark };
                 self.set_theme_preference(next);
             }
             command if command.starts_with("measure.") => crate::measure_ui::command(self, command),
             "view.theme.system" => self.set_theme_preference(ThemePreference::System),
             "view.theme.light" => self.set_theme_preference(ThemePreference::Light),
             "view.theme.dark" => self.set_theme_preference(ThemePreference::Dark),
+            suite if suite.strip_prefix("view.theme.").and_then(nova_themes::ThemeKind::from_name).is_some() => {
+                let Some(kind) = suite.strip_prefix("view.theme.").and_then(nova_themes::ThemeKind::from_name) else { return false };
+                self.set_theme_preference(ThemePreference::Suite(kind));
+            }
             "comment.list" => self.choose_right_panel(Some(RightPanel::Comments)),
             tool if crate::comments::CommentTool::from_command(tool).is_some() => {
                 let Some(tool) = crate::comments::CommentTool::from_command(tool) else { return false };

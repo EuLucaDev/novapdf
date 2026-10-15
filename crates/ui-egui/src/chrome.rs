@@ -274,6 +274,7 @@ pub fn tab_strip(app: &mut NovaPdfApp, ui: &mut egui::Ui) {
                         ThemePreference::System => ("monitor", tl!("Use system setting")),
                         ThemePreference::Light => ("sun", tl!("Light gray")),
                         ThemePreference::Dark => ("moon", tl!("Dark gray")),
+                        ThemePreference::Suite(kind) => (if kind.is_dark() { "moon" } else { "sun" }, kind.label()),
                     };
                     let tip = format!("{}: {label}", tl!("Display theme"));
                     let response = icons::button(ui, icon, button, false, &tip);
@@ -282,7 +283,7 @@ pub fn tab_strip(app: &mut NovaPdfApp, ui: &mut egui::Ui) {
                         app.execute(match app.theme_preference {
                             ThemePreference::System => "view.theme.light",
                             ThemePreference::Light => "view.theme.dark",
-                            ThemePreference::Dark => "view.theme.system",
+                            ThemePreference::Dark | ThemePreference::Suite(_) => "view.theme.system",
                         });
                     }
                     egui::Popup::context_menu(&response).id(response.id.with("theme_menu")).show(|ui| appearance_menu(app, ui));
@@ -307,6 +308,13 @@ fn theme_menu(app: &mut NovaPdfApp, ui: &mut egui::Ui) {
     ] {
         if ui.add(widgets::radio(app.theme_preference == preference, tl!(label))).clicked() {
             app.execute(command);
+            ui.close();
+        }
+    }
+    ui.separator();
+    for kind in nova_themes::ThemeKind::ALL {
+        if ui.add(widgets::radio(app.theme_preference == ThemePreference::Suite(kind), kind.label())).clicked() {
+            app.execute(&format!("view.theme.{}", kind.id()));
             ui.close();
         }
     }
