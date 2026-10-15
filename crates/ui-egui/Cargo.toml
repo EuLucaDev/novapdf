@@ -33,9 +33,9 @@ base64 = "0.22"
 unicode-bidi = "0.3"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-nova-account-ui = { git = "https://github.com/EuLucaDev/nova-live", rev = "ea81ea85a47e12da21d364911b7f168dab8c1c69" }
+nova-account-ui = { git = "https://github.com/EuLucaDev/nova-live", rev = "25720ad8a7aa8cc6e10ffd13091bd69873d9fd95" }
 nova-quit = { workspace = true }
-nova-live = { git = "https://github.com/EuLucaDev/nova-live", rev = "ea81ea85a47e12da21d364911b7f168dab8c1c69" }
+nova-live = { git = "https://github.com/EuLucaDev/nova-live", rev = "25720ad8a7aa8cc6e10ffd13091bd69873d9fd95" }
 
 # Control-channel tokens.
 getrandom = "0.4"
