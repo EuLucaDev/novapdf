@@ -3365,7 +3365,7 @@ dependencies = [
 [[package]]
 name = "nova-account-ui"
 version = "0.1.0"
-source = "git+https://github.com/EuLucaDev/nova-live?rev=25720ad8a7aa8cc6e10ffd13091bd69873d9fd95#25720ad8a7aa8cc6e10ffd13091bd69873d9fd95"
+source = "git+https://github.com/EuLucaDev/nova-live?rev=d0c50673eb1b525c3efbfda72e33bdeb4569e1e7#d0c50673eb1b525c3efbfda72e33bdeb4569e1e7"
 dependencies = [
  "egui",
  "image",
@@ -3375,7 +3375,7 @@ dependencies = [
 [[package]]
 name = "nova-live"
 version = "0.1.0"
-source = "git+https://github.com/EuLucaDev/nova-live?rev=25720ad8a7aa8cc6e10ffd13091bd69873d9fd95#25720ad8a7aa8cc6e10ffd13091bd69873d9fd95"
+source = "git+https://github.com/EuLucaDev/nova-live?rev=d0c50673eb1b525c3efbfda72e33bdeb4569e1e7#d0c50673eb1b525c3efbfda72e33bdeb4569e1e7"
 dependencies = [
  "base64 0.22.1",
  "getrandom 0.4.3",
@@ -3392,7 +3392,7 @@ dependencies = [
 [[package]]
 name = "nova-live-macos"
 version = "0.1.0"
-source = "git+https://github.com/EuLucaDev/nova-live?rev=25720ad8a7aa8cc6e10ffd13091bd69873d9fd95#25720ad8a7aa8cc6e10ffd13091bd69873d9fd95"
+source = "git+https://github.com/EuLucaDev/nova-live?rev=d0c50673eb1b525c3efbfda72e33bdeb4569e1e7#d0c50673eb1b525c3efbfda72e33bdeb4569e1e7"
 dependencies = [
  "objc2 0.6.4",
  "objc2-foundation 0.3.2",
@@ -3422,7 +3422,7 @@ dependencies = [
 [[package]]
 name = "nova-themes"
 version = "0.1.0"
-source = "git+https://github.com/EuLucaDev/nova-live?rev=09fedc5f70f977109e5d76c4e89db37e0f54ee50#09fedc5f70f977109e5d76c4e89db37e0f54ee50"
+source = "git+https://github.com/EuLucaDev/nova-live?rev=d0c50673eb1b525c3efbfda72e33bdeb4569e1e7#d0c50673eb1b525c3efbfda72e33bdeb4569e1e7"
 dependencies = [
  "serde",
 ]
@@ -3437,7 +3437,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "eframe",
  "egui",
@@ -3459,7 +3459,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-a11y"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "novapdf-content",
  "novapdf-cos",
@@ -3471,7 +3471,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-annot"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "hayro-syntax",
  "novapdf-cos",
@@ -3482,7 +3482,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-audit"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "novapdf-content",
  "novapdf-cos",
@@ -3493,7 +3493,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-automation"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "base64 0.22.1",
  "flate2",
@@ -3514,7 +3514,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-cli"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "base64 0.22.1",
  "novapdf-audit",
@@ -3529,18 +3529,18 @@ dependencies = [
 
 [[package]]
 name = "novapdf-compare"
-version = "0.11.1"
+version = "0.12.0"
 
 [[package]]
 name = "novapdf-content"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "novapdf-cos",
 ]
 
 [[package]]
 name = "novapdf-cos"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "hayro-syntax",
  "novapdf-crypt",
@@ -3552,7 +3552,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-create"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "encoding_rs",
  "hayro-syntax",
@@ -3568,7 +3568,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-crypt"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "aes",
  "md-5",
@@ -3580,7 +3580,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-edit"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "hayro-syntax",
  "kurbo 0.13.1",
@@ -3595,7 +3595,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-engine"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "chrono",
  "icu_properties",
@@ -3633,14 +3633,14 @@ dependencies = [
 
 [[package]]
 name = "novapdf-export"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "flate2",
 ]
 
 [[package]]
 name = "novapdf-filters"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "flate2",
  "proptest",
@@ -3650,7 +3650,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-fonts"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "harfrust",
  "novapdf-cos",
@@ -3660,7 +3660,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-forms"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "hayro-syntax",
  "novapdf-content",
@@ -3672,18 +3672,18 @@ dependencies = [
 
 [[package]]
 name = "novapdf-geom"
-version = "0.11.1"
+version = "0.12.0"
 
 [[package]]
 name = "novapdf-js"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "boa_engine",
 ]
 
 [[package]]
 name = "novapdf-measure"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "novapdf-annot",
  "novapdf-content",
@@ -3695,14 +3695,14 @@ dependencies = [
 
 [[package]]
 name = "novapdf-model"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "novapdf-cos",
 ]
 
 [[package]]
 name = "novapdf-ocr"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "novapdf-fonts",
  "ocrs",
@@ -3712,7 +3712,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-optimize"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "image",
  "novapdf-annot",
@@ -3725,7 +3725,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-organize"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "hayro-syntax",
  "novapdf-content",
@@ -3735,7 +3735,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-platform"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "async-channel",
  "futures-lite",
@@ -3744,7 +3744,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-preflight"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "novapdf-cos",
  "novapdf-model",
@@ -3752,7 +3752,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-print"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "nova-print",
  "novapdf-content",
@@ -3763,7 +3763,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-redact"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "novapdf-annot",
  "novapdf-content",
@@ -3777,7 +3777,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-render"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "bytemuck",
  "flate2",
@@ -3796,7 +3796,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-sign"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "aes",
  "aws-lc-rs",
@@ -3830,7 +3830,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-ui-egui"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "arboard",
  "base64 0.22.1",
@@ -3876,7 +3876,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-web"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "eframe",
  "egui",
@@ -3888,7 +3888,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-xfa"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "base64 0.22.1",
  "image",
@@ -3902,7 +3902,7 @@ dependencies = [
 
 [[package]]
 name = "novapdf-xfdf"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "novapdf-annot",
  "novapdf-cos",

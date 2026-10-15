@@ -5,7 +5,7 @@ exclude = ["vendor", "vendor"]
 default-members = ["crates/*", "apps/novapdf", "apps/novapdf-cli", "xtask"]
 
 [workspace.package]
-version = "0.11.1"
+version = "0.12.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 rust-version = "1.95"
@@ -19,37 +19,37 @@ nova-print = { path = "vendor/novafoods-libs-f03ec27ab2/crates/print" }
 # Native shutdown without tearing down the AppKit window during its run loop.
 nova-quit = { path = "vendor/novafoods-libs-f03ec27ab2/crates/quit", features = ["egui"] }
 # internal
-novapdf-geom = { path = "crates/geom", version = "0.11.1" }
-novapdf-filters = { path = "crates/filters", version = "0.11.1" }
-novapdf-cos = { path = "crates/cos", version = "0.11.1" }
-novapdf-crypt = { path = "crates/crypt", version = "0.11.1" }
-novapdf-organize = { path = "crates/organize", version = "0.11.1" }
-novapdf-measure = { path = "crates/measure", version = "0.11.1" }
-novapdf-annot = { path = "crates/annot", version = "0.11.1" }
-novapdf-audit = { path = "crates/audit", version = "0.11.1" }
-novapdf-fonts = { path = "crates/fonts", version = "0.11.1" }
-novapdf-model = { path = "crates/model", version = "0.11.1" }
-novapdf-content = { path = "crates/content", version = "0.11.1" }
-novapdf-redact = { path = "crates/redact", version = "0.11.1" }
-novapdf-print = { path = "crates/print", version = "0.11.1" }
-novapdf-xfdf = { path = "crates/xfdf", version = "0.11.1" }
-novapdf-sign = { path = "crates/sign", version = "0.11.1" }
-novapdf-optimize = { path = "crates/optimize", version = "0.11.1" }
-novapdf-a11y = { path = "crates/a11y", version = "0.11.1" }
-novapdf-ocr = { path = "crates/ocr", version = "0.11.1" }
-novapdf-js = { path = "crates/js", version = "0.11.1" }
-novapdf-compare = { path = "crates/compare", version = "0.11.1" }
-novapdf-preflight = { path = "crates/preflight", version = "0.11.1" }
-novapdf-export = { path = "crates/export", version = "0.11.1" }
-novapdf-edit = { path = "crates/edit", version = "0.11.1" }
-novapdf-create = { path = "crates/create", version = "0.11.1" }
-novapdf-forms = { path = "crates/forms", version = "0.11.1" }
-novapdf-xfa = { path = "crates/xfa", version = "0.11.1" }
-novapdf-render = { path = "crates/render", version = "0.11.1" }
-novapdf-engine = { path = "crates/engine", version = "0.11.1" }
-novapdf-platform = { path = "crates/platform", version = "0.11.1" }
-novapdf-ui-egui = { path = "crates/ui-egui", version = "0.11.1" }
-novapdf-automation = { path = "crates/automation", version = "0.11.1", default-features = false }
+novapdf-geom = { path = "crates/geom", version = "0.12.0" }
+novapdf-filters = { path = "crates/filters", version = "0.12.0" }
+novapdf-cos = { path = "crates/cos", version = "0.12.0" }
+novapdf-crypt = { path = "crates/crypt", version = "0.12.0" }
+novapdf-organize = { path = "crates/organize", version = "0.12.0" }
+novapdf-measure = { path = "crates/measure", version = "0.12.0" }
+novapdf-annot = { path = "crates/annot", version = "0.12.0" }
+novapdf-audit = { path = "crates/audit", version = "0.12.0" }
+novapdf-fonts = { path = "crates/fonts", version = "0.12.0" }
+novapdf-model = { path = "crates/model", version = "0.12.0" }
+novapdf-content = { path = "crates/content", version = "0.12.0" }
+novapdf-redact = { path = "crates/redact", version = "0.12.0" }
+novapdf-print = { path = "crates/print", version = "0.12.0" }
+novapdf-xfdf = { path = "crates/xfdf", version = "0.12.0" }
+novapdf-sign = { path = "crates/sign", version = "0.12.0" }
+novapdf-optimize = { path = "crates/optimize", version = "0.12.0" }
+novapdf-a11y = { path = "crates/a11y", version = "0.12.0" }
+novapdf-ocr = { path = "crates/ocr", version = "0.12.0" }
+novapdf-js = { path = "crates/js", version = "0.12.0" }
+novapdf-compare = { path = "crates/compare", version = "0.12.0" }
+novapdf-preflight = { path = "crates/preflight", version = "0.12.0" }
+novapdf-export = { path = "crates/export", version = "0.12.0" }
+novapdf-edit = { path = "crates/edit", version = "0.12.0" }
+novapdf-create = { path = "crates/create", version = "0.12.0" }
+novapdf-forms = { path = "crates/forms", version = "0.12.0" }
+novapdf-xfa = { path = "crates/xfa", version = "0.12.0" }
+novapdf-render = { path = "crates/render", version = "0.12.0" }
+novapdf-engine = { path = "crates/engine", version = "0.12.0" }
+novapdf-platform = { path = "crates/platform", version = "0.12.0" }
+novapdf-ui-egui = { path = "crates/ui-egui", version = "0.12.0" }
+novapdf-automation = { path = "crates/automation", version = "0.12.0", default-features = false }
 
 # pdf
 hayro = "0.7.1"
