@@ -14,10 +14,12 @@ repository = "https://github.com/EuLucaDev/novapdf"
 [workspace.dependencies]
 # Shared frontend components; engines remain independent of egui.
 nova-ui = { path = "vendor/novafoods-libs-5c874d51ee/crates/ui", features = ["serde"] }
+# Quit the macOS way (#1136): ⌘Q asks about unsaved changes, and closing quits through `terminate:`.
+nova-quit = { path = "vendor/novafoods-libs-f58bc1a3df/crates/quit" }
 # Shared system spooler; document composition remains in novapdf-print.
-nova-print = { path = "vendor/novafoods-libs-f03ec27ab2/crates/print" }
-# Native shutdown without tearing down the AppKit window during its run loop.
-nova-quit = { path = "vendor/novafoods-libs-f03ec27ab2/crates/quit", features = ["egui"] }
+nova-print = { path = "vendor/novafoods-libs-666c358065/crates/print" }
+# Whether a path stored in a document may be opened (GoToR link targets).
+craft-docpath = { path = "vendor/novafoods-libs-82a24b006e/crates/docpath" }
 # internal
 novapdf-geom = { path = "crates/geom", version = "0.12.0" }
 novapdf-filters = { path = "crates/filters", version = "0.12.0" }
@@ -36,6 +38,8 @@ novapdf-xfdf = { path = "crates/xfdf", version = "0.12.0" }
 novapdf-sign = { path = "crates/sign", version = "0.12.0" }
 novapdf-optimize = { path = "crates/optimize", version = "0.12.0" }
 novapdf-a11y = { path = "crates/a11y", version = "0.12.0" }
+novapdf-oracle = { path = "crates/oracle", version = "0.12.0" }
+novapdf-testkit = { path = "crates/testkit", version = "0.12.0" }
 novapdf-ocr = { path = "crates/ocr", version = "0.12.0" }
 novapdf-js = { path = "crates/js", version = "0.12.0" }
 novapdf-compare = { path = "crates/compare", version = "0.12.0" }
@@ -112,3 +116,4 @@ hayro-jbig2 = { path = "vendor/hayro-jbig2" }
 lopdf = { path = "vendor/lopdf" }
 winit = { path = "vendor/winit" }
 egui-wgpu = { path = "vendor/egui-wgpu" }
+vello_common = { path = "vendor/vello_common" }

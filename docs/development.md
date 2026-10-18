@@ -50,7 +50,7 @@ do not contact a desktop session bus. Page and document colours retain their exi
 ## Logs
 
 The desktop app writes its `log` records to standard error and to `logs/novapdf.log` in its
-settings folder, next to `app.ron`: Linux and FreeBSD `~/.local/share/novapdf/logs/` (or
+data folder: Linux and FreeBSD `~/.local/share/novapdf/logs/` (or
 `$XDG_DATA_HOME/novapdf/logs/`), macOS `~/Library/Application Support/Nova PDF/logs/`, Windows
 `%APPDATA%\Nova PDF\data\logs\`. In portable mode (a `portable.txt` file next to the executable, as
 the Windows portable zip ships) the settings folder is `Nova PDFData\` beside the executable, and
@@ -105,13 +105,26 @@ reach this retry instead of the uncaptured-error panic handler. This does not fi
 driver's shader compilation, and explicit `NOVAPDF_RENDERER=wgpu` still disables the retry.
 `NOVAPDF_RENDERER` skips it or chooses OpenGL from the start.
 
+## Preferences
+
+Linux and FreeBSD store `app.ron` in `$XDG_CONFIG_HOME/novapdf/`, or
+`~/.config/novapdf/` when that variable is unset, empty or relative. This follows the
+[XDG Base Directory Specification](https://specifications.freedesktop.org/basedir/latest/).
+On first launch after upgrading, existing `app.ron` preferences are copied from the old
+data folder without replacing an existing configuration file. The old copy is retained;
+logs, crash recovery and digital IDs stay in their data locations. If migration fails,
+the app logs the failure and continues using the original preferences folder.
+The existing Nova PDF-to-Nova PDF migration runs first. macOS, Windows and portable
+copies retain their current preferences locations.
+
 ## Environment variables
 
 | Variable | Effect |
 |---|---|
 | `RUST_LOG` | Log levels for standard error and the log file (see [Logs](#logs)) |
 | `RUST_BACKTRACE` | `1` adds a backtrace to the report of an internal error |
-| `XDG_DATA_HOME` | Linux/FreeBSD: base of the settings folder (`novapdf/`), the log folder and crash recovery |
+| `XDG_CONFIG_HOME` | Linux/FreeBSD: absolute configuration base for `novapdf/app.ron`; defaults to `~/.config` |
+| `XDG_DATA_HOME` | Linux/FreeBSD: base of the log folder and crash recovery; previous preferences are migrated from here |
 | `WGPU_POWER_PREF` | GPU choice; by default Nova PDF draws on the GPU the Wayland compositor draws with (it says so through linux-dmabuf feedback), else the GPU that drives the primary display (Windows) or the built-in panel (Linux), else the low-power (integrated) GPU. The log says which one was chosen |
 | `WGPU_BACKEND` | Graphics backend; by default Windows uses Direct3D 12, falling back to OpenGL |
 | `WGPU_VALIDATION_INDIRECT_CALL` | `1` turns wgpu's check of indirect draw arguments back on. Nova PDF draws nothing indirectly and turns it off, since the compute shader the check needs fails to compile on some drivers (Metal on an Intel Iris Pro), which lost the device at start-up |
@@ -120,3 +133,17 @@ driver's shader compilation, and explicit `NOVAPDF_RENDERER=wgpu` still disables
 | `NOVAPDF_BUILD_LABEL` | Build time: a label for a local or patched build (letters, digits, inner dots), shown after the version in `--version`, About and the log (`0.7.1 (titlebar)`). `packaging/linux/package.sh` also puts it in the file names and the .rpm/.deb release (`1.titlebar`), which upgrades over the release of the same version |
 | `NOVAFOODS_FONTS_DIR` | Build time: a [novafoods-fonts](https://github.com/EuLucaDev/novafoods-fonts) checkout to embed (Japanese fonts) |
 | `NOVAPDF_SYSTEM_FONTS` | `0` stops the desktop app from using an installed font for characters its embedded fonts lack (`cargo xtask screenshots` sets it) |
+| `FONTCONFIG_FILE` | On Linux/Unix, the Fontconfig configuration file used to discover installed UI fallback fonts (default: `/etc/fonts/fonts.conf`); relative filenames are resolved under `FONTCONFIG_PATH` |
+| `FONTCONFIG_PATH` | Directory for a relative `FONTCONFIG_FILE` (default: `/etc/fonts`; the first entry of a search path is used) |
+
+On Linux/Unix, the UI's existing fallback filenames are also searched in Fontconfig's configured
+directories and their subdirectories. This finds fonts in Nix store paths and user font directories
+without invoking `fc-match` or linking libfontconfig. The scan is cached and bounded; missing or
+malformed configuration leaves the ordinary `/usr/share/fonts` and `/usr/local/share/fonts`
+candidates available. Font size and glyph-coverage checks still apply. This only reads installed
+fonts for the interface; it does not embed them into PDFs or packages.
+
+Relative includes resolve beside the config that contains them. Included directories load only
+digit-prefixed `*.conf` files, in lexical order; backups and disabled files are ignored. The scan
+limits each config to 1 MiB, visits at most 256 config files/directories, and bounds include depth
+to 16 and directory entries to 32,768. Cyclic includes are skipped.

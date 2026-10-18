@@ -11,5 +11,6 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
+novapdf-content = { workspace = true }
 novapdf-cos = { workspace = true }
 novapdf-model = { workspace = true }

@@ -15,3 +15,6 @@ novapdf-content = { workspace = true }
 novapdf-annot = { workspace = true }
 serde = { workspace = true }
 thiserror = { workspace = true }
+
+[dev-dependencies]
+novapdf-testkit = { workspace = true }

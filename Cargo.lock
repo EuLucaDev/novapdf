@@ -1172,6 +1172,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "craft-docpath"
+version = "0.1.0"
+
+[[package]]
 name = "crc32fast"
 version = "1.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1190,6 +1194,15 @@ dependencies = [
  "der 0.7.10",
  "spki 0.7.3",
  "x509-cert",
+]
+
+[[package]]
+name = "crossbeam-channel"
+version = "0.5.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "98b0cc327b5bc766e7fda9c9260cc0fa81b43a8e240440422dff70788e3f9ef1"
+dependencies = [
+ "crossbeam-utils",
 ]
 
 [[package]]
@@ -1875,7 +1888,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -2079,6 +2092,15 @@ checksum = "b8eb065f3251655b3c90e22e5e363f310fc5332fb3402e37bbc94752283248f6"
 dependencies = [
  "bytemuck",
  "serde",
+]
+
+[[package]]
+name = "fontconfig-parser"
+version = "0.5.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bbc773e24e02d4ddd8395fd30dc147524273a83e54e0f312d986ea30de5f5646"
+dependencies = [
+ "roxmltree",
 ]
 
 [[package]]
@@ -3031,6 +3053,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "keyboard-types"
+version = "0.8.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0fbe853b403ae61a04233030ae8a79d94975281ed9770a1f9e246732b534b28d"
+dependencies = [
+ "bitflags 2.13.2",
+ "serde",
+]
+
+[[package]]
 name = "khronos-egl"
 version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3274,6 +3306,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "muda"
+version = "0.21.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4340e89c178916e62879c5c36b7f699019369be413e496178a6983ce91b8bc03"
+dependencies = [
+ "crossbeam-channel",
+ "dpi",
+ "keyboard-types",
+ "objc2 0.6.4",
+ "objc2-app-kit 0.3.2",
+ "objc2-core-foundation",
+ "objc2-foundation 0.3.2",
+ "png 0.18.1",
+ "thiserror 2.0.21",
+ "windows-sys 0.60.2",
+]
+
+[[package]]
 name = "multiversion_no_op"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3415,6 +3465,7 @@ version = "0.1.0"
 dependencies = [
  "dispatch2",
  "egui",
+ "muda",
  "objc2 0.6.4",
  "objc2-app-kit 0.3.2",
 ]
@@ -3443,9 +3494,11 @@ dependencies = [
  "egui",
  "fmv-macos-events",
  "log",
+ "nova-quit",
  "novapdf-engine",
  "novapdf-ui-egui",
  "pollster 1.0.1",
+ "raw-window-handle",
  "rustls-native-certs",
  "serde_json",
  "uds_windows",
@@ -3453,6 +3506,7 @@ dependencies = [
  "wayland-client",
  "wayland-protocols",
  "windows",
+ "winit",
  "winresource",
  "winsafe",
 ]
@@ -3521,6 +3575,7 @@ dependencies = [
  "novapdf-automation",
  "novapdf-cos",
  "novapdf-engine",
+ "novapdf-platform",
  "novapdf-render",
  "rustix 1.1.5",
  "serde_json",
@@ -3545,6 +3600,8 @@ dependencies = [
  "hayro-syntax",
  "novapdf-crypt",
  "novapdf-filters",
+ "novapdf-oracle",
+ "novapdf-testkit",
  "proptest",
  "serde_json",
  "thiserror 2.0.21",
@@ -3598,6 +3655,7 @@ name = "novapdf-engine"
 version = "0.12.0"
 dependencies = [
  "chrono",
+ "craft-docpath",
  "icu_properties",
  "idna",
  "image",
@@ -3628,6 +3686,7 @@ dependencies = [
  "png 0.18.1",
  "serde_json",
  "thiserror 2.0.21",
+ "unicode-segmentation",
  "url",
 ]
 
@@ -3689,6 +3748,7 @@ dependencies = [
  "novapdf-content",
  "novapdf-cos",
  "novapdf-model",
+ "novapdf-testkit",
  "serde",
  "thiserror 2.0.21",
 ]
@@ -3724,12 +3784,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "novapdf-oracle"
+version = "0.12.0"
+
+[[package]]
 name = "novapdf-organize"
 version = "0.12.0"
 dependencies = [
  "hayro-syntax",
  "novapdf-content",
  "novapdf-cos",
+ "novapdf-oracle",
  "thiserror 2.0.21",
 ]
 
@@ -3739,6 +3804,7 @@ version = "0.12.0"
 dependencies = [
  "async-channel",
  "futures-lite",
+ "rustix 1.1.5",
  "zbus",
 ]
 
@@ -3746,6 +3812,7 @@ dependencies = [
 name = "novapdf-preflight"
 version = "0.12.0"
 dependencies = [
+ "novapdf-content",
  "novapdf-cos",
  "novapdf-model",
 ]
@@ -3772,6 +3839,8 @@ dependencies = [
  "novapdf-fonts",
  "novapdf-forms",
  "novapdf-model",
+ "novapdf-testkit",
+ "novapdf-xfa",
  "thiserror 2.0.21",
 ]
 
@@ -3829,6 +3898,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "novapdf-testkit"
+version = "0.12.0"
+
+[[package]]
 name = "novapdf-ui-egui"
 version = "0.12.0"
 dependencies = [
@@ -3839,6 +3912,7 @@ dependencies = [
  "egui",
  "egui_extras",
  "egui_kittest",
+ "fontconfig-parser",
  "getrandom 0.4.3",
  "image",
  "js-sys",
@@ -4946,7 +5020,7 @@ dependencies = [
  "once_cell",
  "socket2",
  "tracing",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -5483,7 +5557,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys 0.4.15",
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -5496,14 +5570,14 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys 0.12.1",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
 name = "rustls"
-version = "0.23.45"
+version = "0.23.46"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0d41d731c7d2f962d1ccc364cec258de3c0e93b38c2fb3ba97ac74513048d634"
+checksum = "48e13bd8c0e9365c43cfa5c9e8f9ad49d3c8444926c9aac819e0e4dc503c8fdf"
 dependencies = [
  "aws-lc-rs",
  "log",
@@ -5566,7 +5640,7 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -6221,7 +6295,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3d1e2c7f27f8d4cb10542a02c49005dbd6e93095799d6f3be745fae9f8fedd4"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -6443,7 +6517,7 @@ dependencies = [
  "getrandom 0.3.4",
  "once_cell",
  "rustix 1.1.5",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -6828,7 +6902,7 @@ checksum = "f2f6fb2847f6742cd76af783a2a2c49e9375d0a111c7bef6f71cd9e738c72d6e"
 dependencies = [
  "memoffset",
  "tempfile",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -6992,8 +7066,6 @@ dependencies = [
 [[package]]
 name = "vello_common"
 version = "0.0.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3361bff7f7d82c0c496b92048db83846691f0e844cc28dee92b1c824291b55ee"
 dependencies = [
  "bytemuck",
  "fearless_simd",
@@ -7558,7 +7630,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -7678,15 +7750,6 @@ name = "windows-sys"
 version = "0.52.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "282be5f36a8ce781fad8c8ae18fa3f9beff57ec1b52cb3de0789201425d9a33d"
-dependencies = [
- "windows-targets 0.52.6",
-]
-
-[[package]]
-name = "windows-sys"
-version = "0.59.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e38bc4d79ed67fd075bcc251a1c39b32a1776bbe92e5bef1f0bf1f8c531853b"
 dependencies = [
  "windows-targets 0.52.6",
 ]
@@ -8087,6 +8150,8 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "lopdf",
+ "novapdf-cos",
+ "novapdf-oracle",
  "png 0.18.1",
  "serde",
  "serde_json",

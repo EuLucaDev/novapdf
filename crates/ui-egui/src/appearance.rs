@@ -103,11 +103,11 @@ fn preview(ui: &mut egui::Ui, kind: ThemeKind, width: f32) {
 }
 
 /// One theme card: its title, Active when it is what shows now, a preview of the chosen theme
-/// and a radio row per theme. Returns the theme clicked.
+/// and a radio row per theme; the whole card picks its shown theme. Returns the theme clicked.
 fn card(ui: &mut egui::Ui, t: &Tokens, title: &str, current: ThemeKind, themes: &[(ThemeKind, &str)]) -> Option<ThemeKind> {
     let active = themes.iter().any(|(k, _)| *k == current);
     let mut picked = None;
-    egui::Frame::new()
+    let inner = egui::Frame::new()
         .fill(t.card)
         .stroke(egui::Stroke::new(1.0, if active { t.accent } else { t.border }))
         .corner_radius(6.0)
@@ -124,18 +124,26 @@ fn card(ui: &mut egui::Ui, t: &Tokens, title: &str, current: ThemeKind, themes: 
             let shown = if active { current } else { themes.first().map_or(ThemeKind::Light, |(kind, _)| *kind) };
             preview(ui, shown, ui.available_width());
             ui.add_space(4.0);
+            let mut clicked = false;
             for (kind, label) in themes {
                 if ui.add(widgets::radio(active && *kind == current, tl!(label))).clicked() {
                     picked = Some(*kind);
+                    clicked = true;
                 }
             }
+            clicked
         });
+    // The whole card picks its theme, not just the radio row.
+    let whole = inner.response.interact(egui::Sense::click()).on_hover_cursor(egui::CursorIcon::PointingHand);
+    if !inner.inner && whole.clicked() {
+        picked = Some(if active { current } else { themes.first().map_or(ThemeKind::Light, |(kind, _)| *kind) });
+    }
     picked
 }
 
 /// The Appearance section of Preferences.
 pub fn preferences_section(ui: &mut egui::Ui, app: &mut NovaPdfApp, t: &Tokens) {
-    ui.label(RichText::new(tl!("Appearance")).font(theme::semibold(13.0)));
+    ui.label(RichText::new(tl_ctx!("theme", "Appearance")).font(theme::semibold(13.0)));
     ui.horizontal(|ui| {
         ui.label(tl!("Appearance mode"));
         egui::ComboBox::from_id_salt("appearance-mode").selected_text(tl!(mode_label(app.theme_preference))).show_ui(ui, |ui| {
@@ -207,5 +215,33 @@ mod tests {
         h.get_by_label("Use system setting").click();
         h.run();
         assert_eq!(h.state().theme_preference, ThemePreference::System);
+    }
+
+    /// Clicking a theme card, or its radio row, picks that theme, not only the mode combo box.
+    #[test]
+    fn clicking_a_theme_card_picks_that_theme() {
+        let mut app = NovaPdfApp::new();
+        app.set_option("language", "en").unwrap();
+        let mut fonts = false;
+        let mut h = Harness::builder().with_size(egui::vec2(640.0, 400.0)).build_ui_state(
+            move |ui, app: &mut NovaPdfApp| {
+                if !fonts {
+                    ui.ctx().set_fonts(theme::font_definitions());
+                    fonts = true;
+                    return;
+                }
+                let t = Tokens::get(ui.ctx());
+                preferences_section(ui, app, &t);
+            },
+            app,
+        );
+        h.run();
+        h.get_by_label("Dark gray").click();
+        h.run();
+        assert_eq!((h.state().theme_preference, h.state().theme), (ThemePreference::Dark, ThemeKind::Dark));
+        // The card's title is not a widget of its own: the click lands on the card.
+        h.get_by_label("Light theme").click();
+        h.run();
+        assert_eq!((h.state().theme_preference, h.state().theme), (ThemePreference::Light, ThemeKind::Light));
     }
 }

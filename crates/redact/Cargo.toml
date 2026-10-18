@@ -16,6 +16,8 @@ novapdf-model = { workspace = true }
 novapdf-forms = { workspace = true }
 novapdf-edit = { workspace = true }
 novapdf-annot = { workspace = true }
+novapdf-xfa = { workspace = true }
 thiserror = { workspace = true }
 
 [dev-dependencies]
+novapdf-testkit = { workspace = true }

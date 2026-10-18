@@ -19,6 +19,7 @@ novapdf-engine = { workspace = true }
 novapdf-audit = { workspace = true }
 novapdf-cos = { workspace = true }
 novapdf-automation = { workspace = true }
+novapdf-platform = { workspace = true }
 base64 = "0.22"
 
 [target.'cfg(unix)'.dependencies]

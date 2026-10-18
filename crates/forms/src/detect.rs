@@ -3,10 +3,12 @@
 //! field from the label next to it (Acrobat's auto-naming).
 //!
 //! [`detect`] is a pure function over the page's words and drawn shapes; [`page_shapes`] reads
-//! the shapes from a page's content.
+//! the shapes from a page's content, [`raster::shapes`] from a picture of the page (a scan).
 
 use novapdf_content::{Matrix, parse};
 use novapdf_cos::{Document, Object};
+
+pub mod raster;
 
 /// A piece of text on the page, in user space.
 #[derive(Clone, Debug, PartialEq)]
